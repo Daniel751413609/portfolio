@@ -528,14 +528,6 @@ footer { background: var(--navy); padding: 60px 48px; text-align: center; }
 
 /* ══ VISUAL UPGRADES ══════════════════════════════════════════════ */
 
-/* Gradient text — section titles on light-bg sections */
-.gradient-text {
-  background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #6366f1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 /* Mouse cursor glow */
 #cursor-glow {
   position: fixed;

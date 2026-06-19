@@ -96,15 +96,6 @@ function initFadeUp() {
   }
 }
 
-/* ── Gradient Text on Section Titles ───────────────────────────── */
-function initGradientTitles() {
-  ['#about', '#experience', '#skills', '#education', '#project', '#petnfc']
-    .forEach(sel => {
-      const t = document.querySelector(`${sel} .section-title`);
-      if (t) t.classList.add('gradient-text');
-    });
-}
-
 /* ── Nav ───────────────────────────────────────────────────────── */
 function initNav() {
   const heroImg = document.querySelector('.hero-photo-wrap img');
@@ -124,6 +115,5 @@ window.addEventListener('DOMContentLoaded', () => {
   initNav();
   initFadeUp();
   initCounters();
-  initGradientTitles();
   initCursorGlow();
 });
