@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>寵物身分識別平台商業模型研究 — Pet Identity Platform Case Study</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --navy: #0a1628;
+  --navy2: #0d1f3c;
+  --teal: #00b4c6;
+  --mint: #00e8c6;
+  --amber: #ffb347;
+  --rose: #ff6b8a;
+  --white: #f0f6ff;
+  --gray: #7090a0;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(0,180,198,0.2);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  cursor: none;
+}
+
+/* Custom cursor */
+#cursor {
+  position: fixed; width:18px; height:18px;
+  border:1.5px solid var(--teal); border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transition: transform 0.15s ease, opacity 0.2s;
+  mix-blend-mode: screen;
+}
+#cursor-dot {
+  position: fixed; width:4px; height:4px;
+  background: var(--mint); border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transition: transform 0.05s ease;
+}
+
+/* Slide system */
+.deck { width:100%; height:100vh; position:relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(30px);
+  display: flex; flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+.slide.active {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0);
+}
+.slide.prev { transform: translateY(-30px); }
+
+/* Nav */
+#nav {
+  position: fixed; bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 10px; align-items: center;
+  z-index: 100; background: rgba(10,22,40,0.7);
+  backdrop-filter: blur(12px);
+  padding: 10px 20px; border-radius: 40px;
+  border: 1px solid rgba(0,180,198,0.25);
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(0,180,198,0.3); cursor: pointer;
+  transition: all 0.3s;
+}
+.dot.active { background: var(--teal); transform: scale(1.4); }
+.dot:hover { background: var(--mint); }
+
+#btn-prev, #btn-next {
+  background: none; border: 1px solid rgba(0,180,198,0.4);
+  color: var(--teal); padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-family: 'Space Mono', monospace;
+  cursor: pointer; transition: all 0.2s;
+}
+#btn-prev:hover, #btn-next:hover {
+  background: rgba(0,180,198,0.15); color: var(--mint);
+}
+
+#slide-counter {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--gray);
+  min-width: 40px; text-align: center;
+}
+
+/* Shared layout */
+.slide-inner {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  padding: 52px 72px 100px;
+  position: relative;
+}
+
+.slide-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: 3px;
+  color: var(--teal); text-transform: uppercase;
+  margin-bottom: 14px; opacity: 0.8;
+}
+
+.slide-title {
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 900; line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.slide-sub {
+  font-size: 15px; color: var(--gray);
+  font-weight: 300; margin-bottom: 40px;
+}
+
+/* ─── SLIDE 0: COVER ─────────────────────────── */
+#s0 { background: var(--navy); }
+
+.cover-canvas {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.cover-canvas canvas { position: absolute; inset: 0; }
+
+.cover-content {
+  position: relative; z-index: 2;
+  display: flex; height: 100%;
+  flex-direction: column; justify-content: center;
+  padding: 0 10vw;
+}
+
+.brand-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; letter-spacing: 5px;
+  color: var(--teal); margin-bottom: 20px;
+  opacity: 0; animation: fadeUp 0.8s 0.3s forwards;
+}
+.cover-title {
+  font-size: clamp(52px, 9vw, 110px);
+  font-weight: 900; line-height: 0.9;
+  opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
+}
+.cover-title span { color: var(--mint); }
+.cover-eng {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(16px, 2.5vw, 28px);
+  color: var(--teal); letter-spacing: 8px;
+  margin-top: 16px; margin-bottom: 32px;
+  opacity: 0; animation: fadeUp 0.8s 0.7s forwards;
+}
+.cover-desc {
+  font-size: 16px; color: var(--gray);
+  max-width: 480px; line-height: 1.7;
+  opacity: 0; animation: fadeUp 0.8s 0.9s forwards;
+}
+
+.cover-stats {
+  position: absolute; right: 8vw; bottom: 14vh;
+  display: flex; flex-direction: column; gap: 20px;
+  opacity: 0; animation: fadeIn 1s 1.1s forwards;
+}
+.cstat {
+  text-align: right; cursor: default;
+}
+.cstat .num {
+  font-family: 'Space Mono', monospace;
+  font-size: 32px; font-weight: 700;
+  color: var(--mint);
+  transition: color 0.2s;
+}
+.cstat:hover .num { color: var(--amber); }
+.cstat .lbl { font-size: 11px; color: var(--gray); }
+
+.cover-cta {
+  margin-top: 48px;
+  opacity: 0; animation: fadeUp 0.8s 1.2s forwards;
+}
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--teal); color: var(--navy);
+  padding: 14px 28px; border-radius: 40px;
+  font-weight: 700; font-size: 14px;
+  cursor: pointer; border: none;
+  transition: all 0.3s; letter-spacing: 1px;
+}
+.cta-btn:hover {
+  background: var(--mint); transform: scale(1.04);
+  box-shadow: 0 0 30px rgba(0,232,198,0.4);
+}
+.cta-arrow { font-size: 18px; transition: transform 0.3s; }
+.cta-btn:hover .cta-arrow { transform: translateX(5px); }
+
+/* ─── SLIDE 1: MARKET ─────────────────────────── */
+#s1 .slide-inner { padding-bottom: 90px; }
+
+.stat-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 24px 20px;
+  text-align: center; position: relative;
+  overflow: hidden; cursor: default;
+  transition: all 0.3s;
+}
+.stat-card::before {
+  content: ''; position: absolute;
+  inset: 0; background: linear-gradient(135deg, rgba(0,180,198,0.08), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.stat-card:hover::before { opacity: 1; }
+.stat-card:hover { transform: translateY(-4px); border-color: rgba(0,180,198,0.5); }
+.stat-card .n {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(24px, 3.5vw, 42px); font-weight: 700;
+  color: var(--mint); line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-card .l { font-size: 12px; color: var(--gray); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+.funnel-wrap { display: flex; flex-direction: column; gap: 10px; }
+.funnel-item {
+  display: flex; align-items: center; gap: 12px;
+  cursor: default;
+}
+.funnel-bar {
+  height: 44px; border-radius: 8px;
+  display: flex; align-items: center; padding: 0 16px;
+  font-size: 13px; font-weight: 700; color: var(--white);
+  transition: all 0.4s;
+  position: relative; overflow: hidden;
+}
+.funnel-bar::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0;
+  width: 0; background: rgba(255,255,255,0.1);
+  transition: width 0.3s;
+}
+.funnel-item:hover .funnel-bar::after { width: 100%; }
+.funnel-val { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gray); white-space: nowrap; }
+
+.law-card {
+  background: rgba(255,179,71,0.07);
+  border: 1px solid rgba(255,179,71,0.3);
+  border-radius: 16px; padding: 24px;
+}
+.law-card h3 { font-size: 14px; color: var(--amber); margin-bottom: 14px; }
+.law-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 12px; font-size: 13px; line-height: 1.5;
+}
+.law-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; margin-top: 5px; }
+
+/* ─── SLIDE 2: COMPETITORS ─────────────────────── */
+.comp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; flex: 1; }
+.comp-card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 24px;
+  display: flex; flex-direction: column;
+  transition: all 0.3s; cursor: default; position: relative;
+  overflow: hidden;
+}
+.comp-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--teal);
+  transform: scaleX(0); transition: transform 0.3s;
+  transform-origin: left;
+}
+.comp-card:hover::before { transform: scaleX(1); }
+.comp-card:hover { transform: translateY(-5px); border-color: rgba(0,180,198,0.4); }
+.comp-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.comp-origin { font-size: 11px; color: var(--teal); margin-bottom: 16px; font-family: 'Space Mono', monospace; }
+.comp-price { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--amber); margin-bottom: 16px; }
+.comp-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.tag {
+  font-size: 10px; padding: 3px 10px; border-radius: 20px;
+  font-weight: 700; letter-spacing: 0.5px;
+}
+.tag-nfc { background: rgba(0,180,198,0.15); color: var(--teal); }
+.tag-gps { background: rgba(255,179,71,0.15); color: var(--amber); }
+.tag-free { background: rgba(0,232,198,0.15); color: var(--mint); }
+.tag-sub { background: rgba(255,107,138,0.15); color: var(--rose); }
+.comp-pros { font-size: 12px; color: #7ecfc0; line-height: 1.7; margin-bottom: 8px; }
+.comp-cons { font-size: 12px; color: rgba(255,107,138,0.8); line-height: 1.7; }
+.comp-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; opacity: 0.6; }
+
+.gap-banner {
+  margin-top: 20px; padding: 16px 24px;
+  background: rgba(0,180,198,0.08);
+  border: 1px solid rgba(0,180,198,0.3);
+  border-radius: 12px;
+  font-size: 13px; line-height: 1.6;
+}
+.gap-banner strong { color: var(--mint); }
+
+/* ─── SLIDE 3: PRODUCT ─────────────────────────── */
+.moat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; flex: 1; }
+.moat-card {
+  border-radius: 20px; padding: 32px 28px;
+  position: relative; overflow: hidden; cursor: default;
+  transition: transform 0.3s;
+}
+.moat-card:hover { transform: translateY(-6px) scale(1.01); }
+.moat-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: inherit; filter: brightness(1.1);
+  opacity: 0; transition: opacity 0.3s;
+}
+.moat-card:hover::after { opacity: 1; }
+.moat-icon {
+  font-size: 36px; margin-bottom: 20px;
+  position: relative; z-index: 1;
+}
+.moat-title {
+  font-size: 18px; font-weight: 700; margin-bottom: 12px;
+  position: relative; z-index: 1;
+}
+.moat-desc {
+  font-size: 13px; line-height: 1.8;
+  position: relative; z-index: 1; opacity: 0.85;
+}
+.moat-1 { background: rgba(0,180,198,0.12); border: 1px solid rgba(0,180,198,0.3); }
+.moat-2 { background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.3); }
+.moat-3 { background: rgba(0,232,198,0.1); border: 1px solid rgba(0,232,198,0.3); }
+
+.core-message {
+  margin-top: 24px; padding: 16px 28px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px; font-size: 14px;
+  color: var(--mint); text-align: center; letter-spacing: 0.5px;
+  border: 1px solid rgba(0,232,198,0.2);
+}
+
+/* ─── SLIDE 4: BIZ MODEL ─────────────────────────── */
+.stream-list { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.stream-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 20px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 12px; transition: all 0.3s; cursor: default;
+  position: relative; overflow: hidden;
+}
+.stream-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+}
+.stream-item:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateX(6px);
+}
+.s-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+.s-bar { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.s-label { font-size: 13px; font-weight: 700; min-width: 180px; }
+.s-range { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--amber); min-width: 120px; text-align: right; }
+.s-margin { font-size: 11px; color: var(--gray); min-width: 70px; text-align: right; }
+
+.biz-total {
+  margin-top: 20px; padding: 18px 28px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(0,180,198,0.08);
+  border: 1px solid rgba(0,180,198,0.3); border-radius: 12px;
+}
+.biz-total .tl { font-size: 14px; }
+.biz-total .tv { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--mint); }
+
+/* ─── SLIDE 5: PROFIT ─────────────────────────── */
+.profit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; }
+.cost-breakdown { display: flex; flex-direction: column; gap: 10px; }
+.cost-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; border-radius: 10px;
+  font-size: 13px; transition: all 0.2s; cursor: default;
+}
+.cost-row:hover { background: rgba(255,255,255,0.04); }
+.cost-row.highlight { background: rgba(0,232,198,0.08); border: 1px solid rgba(0,232,198,0.2); }
+.cost-row .cv { font-family: 'Space Mono', monospace; font-weight: 700; }
+
+.scenario-stack { display: flex; flex-direction: column; gap: 14px; }
+.scenario {
+  padding: 18px 20px; border-radius: 14px;
+  cursor: default; transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.scenario:hover { transform: scale(1.02); }
+.sc-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; opacity: 0.7; margin-bottom: 4px; }
+.sc-rev { font-family: 'Space Mono', monospace; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.sc-detail { font-size: 11px; opacity: 0.7; }
+.sc-bear { background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.3); }
+.sc-base { background: rgba(0,180,198,0.1); border: 1px solid rgba(0,180,198,0.3); }
+.sc-bull { background: rgba(0,232,198,0.1); border: 1px solid rgba(0,232,198,0.3); }
+.sc-bear .sc-rev { color: var(--amber); }
+.sc-base .sc-rev { color: var(--teal); }
+.sc-bull .sc-rev { color: var(--mint); }
+
+/* ─── SLIDE 6: AI ─────────────────────────── */
+.ai-grid { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.ai-row {
+  display: flex; align-items: center; gap: 20px;
+  padding: 16px 20px; border-radius: 12px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  transition: all 0.3s; cursor: default;
+}
+.ai-row:hover { background: rgba(255,255,255,0.06); border-color: rgba(0,232,198,0.3); transform: translateX(6px); }
+.ai-icon-wrap {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.ai-area { font-size: 14px; font-weight: 700; flex: 1; }
+.ai-tool { font-size: 11px; color: var(--teal); margin-top: 2px; font-family: 'Space Mono', monospace; }
+.ai-saving { font-size: 14px; font-weight: 700; color: var(--mint); min-width: 130px; text-align: right; }
+.ai-pct {
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  min-width: 60px; text-align: center; padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.ai-summary {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  margin-top: 16px;
+}
+.ai-sum-card {
+  background: rgba(0,180,198,0.08); border: 1px solid rgba(0,180,198,0.2);
+  border-radius: 12px; padding: 16px; text-align: center;
+}
+.ai-sum-card .n { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: var(--mint); }
+.ai-sum-card .l { font-size: 11px; color: var(--gray); margin-top: 4px; }
+
+/* ─── SLIDE 7: COST ─────────────────────────── */
+.cost-bars { flex: 1; display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+.cbar-item { display: flex; flex-direction: column; gap: 6px; }
+.cbar-header { display: flex; justify-content: space-between; align-items: center; }
+.cbar-label { font-size: 13px; font-weight: 700; }
+.cbar-amt { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--amber); }
+.cbar-track { height: 36px; background: rgba(255,255,255,0.04); border-radius: 8px; overflow: hidden; }
+.cbar-fill {
+  height: 100%; border-radius: 8px;
+  display: flex; align-items: center; padding: 0 14px;
+  font-size: 12px; color: var(--white); font-weight: 500;
+  width: 0; transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+
+.path-compare {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;
+}
+.path-card {
+  padding: 18px 22px; border-radius: 14px;
+  cursor: default; transition: transform 0.3s;
+}
+.path-card:hover { transform: translateY(-3px); }
+.path-lean { background: rgba(0,232,198,0.08); border: 2px solid rgba(0,232,198,0.4); }
+.path-full { background: rgba(0,180,198,0.06); border: 1px solid rgba(0,180,198,0.3); }
+.path-card h4 { font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
+.path-card .pv { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.path-lean .pv { color: var(--mint); }
+.path-full .pv { color: var(--teal); }
+.path-card p { font-size: 11px; color: var(--gray); line-height: 1.6; }
+
+/* ─── SLIDE 8: TIMELINE ─────────────────────────── */
+.timeline-section { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+
+.tl-track { position: relative; padding: 30px 0; }
+.tl-line {
+  position: absolute; top: 50%; left: 0; right: 0;
+  height: 2px; background: rgba(0,180,198,0.2);
+  transform: translateY(-50%);
+}
+.tl-progress {
+  position: absolute; top: 50%; left: 0; height: 2px;
+  background: var(--teal); transform: translateY(-50%);
+  width: 0; transition: width 1.5s ease;
+}
+.tl-nodes { display: flex; justify-content: space-between; position: relative; }
+.tl-node { display: flex; flex-direction: column; align-items: center; gap: 0; flex: 1; cursor: default; }
+.tl-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(0,180,198,0.3);
+  background: var(--navy); position: relative; z-index: 1;
+  transition: all 0.3s; margin: 0 auto;
+}
+.tl-node.done .tl-dot { background: var(--teal); border-color: var(--teal); box-shadow: 0 0 12px rgba(0,180,198,0.5); }
+.tl-node:hover .tl-dot { transform: scale(1.4); }
+.tl-month { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--teal); text-align: center; margin-bottom: 8px; }
+.tl-title { font-size: 11px; font-weight: 700; text-align: center; margin-top: 8px; }
+.tl-note { font-size: 10px; color: var(--gray); text-align: center; margin-top: 3px; }
+
+.lever-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.lever-card {
+  padding: 20px; border-radius: 14px;
+  transition: all 0.3s; cursor: default;
+}
+.lever-card:hover { transform: translateY(-4px); }
+.lever-1 { background: rgba(0,232,198,0.08); border: 1px solid rgba(0,232,198,0.3); }
+.lever-2 { background: rgba(255,179,71,0.08); border: 1px solid rgba(255,179,71,0.3); }
+.lever-3 { background: rgba(0,180,198,0.08); border: 1px solid rgba(0,180,198,0.3); }
+.lever-tag { font-size: 10px; font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
+.lever-1 .lever-tag { color: var(--mint); }
+.lever-2 .lever-tag { color: var(--amber); }
+.lever-3 .lever-tag { color: var(--teal); }
+.lever-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.lever-desc { font-size: 12px; color: var(--gray); line-height: 1.6; }
+
+/* ─── SLIDE 9: CLOSE ─────────────────────────── */
+#s9 { background: var(--navy2); }
+.close-content {
+  display: flex; height: 100%; align-items: center;
+  padding: 0 10vw; gap: 10vw;
+}
+.close-left { flex: 1; }
+.close-headline {
+  font-size: clamp(40px, 6vw, 76px); font-weight: 900;
+  line-height: 1.0; margin-bottom: 24px;
+}
+.close-headline em { color: var(--mint); font-style: normal; }
+.close-sub { font-size: 16px; color: var(--teal); margin-bottom: 36px; font-family: 'Space Mono', monospace; letter-spacing: 1px; }
+
+.summary-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.summary-list li {
+  display: flex; gap: 14px; align-items: flex-start;
+  font-size: 14px; line-height: 1.6;
+  opacity: 0; transform: translateX(-20px);
+  transition: all 0.4s;
+}
+.summary-list li.visible { opacity: 1; transform: translateX(0); }
+.sum-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); flex-shrink: 0; margin-top: 7px; }
+
+.close-right {
+  display: flex; flex-direction: column; gap: 16px;
+  min-width: 260px;
+}
+.close-stat {
+  text-align: right; padding: 20px 24px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 14px; transition: all 0.3s; cursor: default;
+}
+.close-stat:hover { border-color: rgba(0,232,198,0.4); transform: translateX(-4px); }
+.close-stat .cn { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--mint); }
+.close-stat .cl { font-size: 11px; color: var(--gray); }
+
+/* ─── ANIMATIONS ─────────────────────────── */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(24px); }
+  to { opacity:1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; } to { opacity:1; }
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,180,198,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(0,180,198,0); }
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Noise overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+/* keyboard hint */
+#key-hint {
+  position: fixed; top: 24px; right: 24px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; color: rgba(112,144,160,0.5);
+  z-index: 100; letter-spacing: 1px;
+}
+
+/* Progress bar */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, var(--teal), var(--mint));
+  z-index: 200; transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-dot"></div>
+<div id="progress-bar"></div>
+<div id="key-hint">← → 或鍵盤切換</div>
+
+<div class="deck">
+
+  <!-- SLIDE 0: COVER -->
+  <div class="slide active" id="s0">
+    <div class="cover-canvas"><canvas id="particleCanvas"></canvas></div>
+    <div class="cover-content">
+      <div class="brand-tag">// BUSINESS CASE STUDY 2025</div>
+      <div class="cover-title">寵物<span>識別</span></div>
+      <div class="cover-eng">PET IDENTITY PLATFORM STUDY</div>
+      <div class="cover-desc">以台灣寵物識別應用場景為主題的市場研究、競品分析與商業模型設計案例</div>
+      <div class="cover-cta">
+        <button class="cta-btn" onclick="goTo(1)">
+          開始簡報 <span class="cta-arrow">→</span>
+        </button>
+      </div>
+    </div>
+    <div class="cover-stats">
+      <div class="cstat"><div class="num" data-target="279">0</div><div class="lbl">萬隻犬貓</div></div>
+      <div class="cstat"><div class="num" data-target="631">0</div><div class="lbl">億產業規模</div></div>
+      <div class="cstat"><div class="num" data-target="9.4" data-dec="1">0</div><div class="lbl">% 年複合成長</div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 1: MARKET -->
+  <div class="slide" id="s1">
+    <div class="slide-inner">
+      <div class="slide-tag">01 / 市場機會</div>
+      <div class="slide-title">台灣寵物市場——<br>供需缺口正在擴大</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="n">279<span style="font-size:0.5em">萬</span></div><div class="l">犬貓飼養總數</div></div>
+        <div class="stat-card"><div class="n">28.3<span style="font-size:0.5em">%</span></div><div class="l">家庭飼養比例</div></div>
+        <div class="stat-card"><div class="n">23<span style="font-size:0.5em">萬</span></div><div class="l">每年新登記數</div></div>
+        <div class="stat-card"><div class="n">631<span style="font-size:0.5em">億</span></div><div class="l">產業年規模 NTD</div></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div style="font-size:12px;color:var(--teal);letter-spacing:2px;font-weight:700;margin-bottom:14px;font-family:'Space Mono',monospace">市場規模漏斗</div>
+          <div class="funnel-wrap">
+            <div class="funnel-item">
+              <div class="funnel-bar" style="background:var(--navy2);border:1px solid rgba(0,180,198,0.3);width:100%;color:var(--teal)">TAM &nbsp;全台犬貓</div>
+              <div class="funnel-val">279萬隻</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-bar" style="background:rgba(0,180,198,0.25);width:80%">SAM &nbsp;都會有消費力</div>
+              <div class="funnel-val">154萬隻</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-bar" style="background:var(--teal);width:55%">SOM Y1 早期採用者</div>
+              <div class="funnel-val">1–2萬組</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-bar" style="background:var(--mint);width:35%;color:var(--navy)">SOM Y3 擴張後</div>
+              <div class="funnel-val">5–8萬組</div>
+            </div>
+          </div>
+        </div>
+        <div class="law-card">
+          <h3>⚡ 法規催化劑</h3>
+          <div class="law-item"><div class="law-dot"></div><span>2025 年 8 月起貓咪強制植入晶片登記</span></div>
+          <div class="law-item"><div class="law-dot"></div><span>每年新增 23 萬隻識別需求</span></div>
+          <div class="law-item"><div class="law-dot"></div><span>NFC 吊牌可作「晶片數位名片」延伸</span></div>
+          <div class="law-item"><div class="law-dot"></div><span>法規直接創造換購需求潮</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: COMPETITORS -->
+  <div class="slide" id="s2">
+    <div class="slide-inner">
+      <div class="slide-tag">02 / 競品分析</div>
+      <div class="slide-title">國際競品現況<br><span style="color:var(--teal)">台灣市場：零本土競品</span></div>
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="comp-name">PetHub</div>
+          <div class="comp-origin">美國 · 2010年創立</div>
+          <div class="comp-tags"><span class="tag tag-nfc">NFC</span><span class="tag tag-nfc">QR</span><span class="tag tag-sub">訂閱制</span></div>
+          <div class="comp-price">$10–25 / 吊牌</div>
+          <div class="comp-section-label">優勢</div>
+          <div class="comp-pros">96% 寵物 24h 內找回<br>最早 NFC 專利（2012）<br>北美最成熟生態</div>
+          <div class="comp-section-label" style="margin-top:10px">不足</div>
+          <div class="comp-cons">進階功能需付費訂閱<br>不含 GPS，僅 QR/NFC</div>
+        </div>
+        <div class="comp-card">
+          <div class="comp-name">PawView</div>
+          <div class="comp-origin">美國 · 近年新興</div>
+          <div class="comp-tags"><span class="tag tag-nfc">NFC</span><span class="tag tag-nfc">QR</span><span class="tag tag-free">免費</span></div>
+          <div class="comp-price">$12–20 / 吊牌</div>
+          <div class="comp-section-label">優勢</div>
+          <div class="comp-pros">矽膠靜音不叮噹<br>掃描即時地點通知<br>健康記錄、AI 獸醫</div>
+          <div class="comp-section-label" style="margin-top:10px">不足</div>
+          <div class="comp-cons">App 功能較重<br>非 GPS 追蹤</div>
+        </div>
+        <div class="comp-card">
+          <div class="comp-name">Tractive GPS</div>
+          <div class="comp-origin">奧地利 · 全球第一</div>
+          <div class="comp-tags"><span class="tag tag-gps">GPS</span><span class="tag tag-sub">月費 $5+</span></div>
+          <div class="comp-price">$50–80 硬體 + 月費</div>
+          <div class="comp-section-label">優勢</div>
+          <div class="comp-pros">即時 GPS 定位<br>175 國覆蓋<br>電子圍籬、逃脫警報</div>
+          <div class="comp-section-label" style="margin-top:10px">不足</div>
+          <div class="comp-cons">需持續充電<br>月費成本高，體積大</div>
+        </div>
+      </div>
+      <div class="gap-banner">
+        台灣市場缺口：<strong>本土零競品</strong> — 無任何品牌提供「NFC 吊牌 + 繁中雲端檔案 + Line 通知」整合服務，<strong>先進者可建立難以複製的信任壁壘</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: PRODUCT -->
+  <div class="slide" id="s3">
+    <div class="slide-inner">
+      <div class="slide-tag">03 / 產品定位</div>
+      <div class="slide-title">三大競爭護城河</div>
+      <div class="slide-sub">國際品牌短期無法複製的在地優勢</div>
+      <div class="moat-grid">
+        <div class="moat-card moat-1">
+          <div class="moat-icon">💬</div>
+          <div class="moat-title">Line Bot 原生整合</div>
+          <div class="moat-desc">台灣人不裝 App 但人人用 Line<br><br>掃描 NFC → 即時推播飼主精確位置<br>無需下載、零摩擦使用體驗<br><br>國際品牌全部要求安裝 App，這是最直接的差異化</div>
+        </div>
+        <div class="moat-card moat-2">
+          <div class="moat-icon">🔗</div>
+          <div class="moat-title">晶片 + NFC 雙軌識別</div>
+          <div class="moat-desc">結合農業部登記晶片編號<br><br>NFC 吊牌成為「晶片的數位名片」<br>正式識別 + 緊急聯絡一體整合<br><br>法規合規性讓產品有官方背書感</div>
+        </div>
+        <div class="moat-card moat-3">
+          <div class="moat-icon">🇹🇼</div>
+          <div class="moat-title">在地化服務壁壘</div>
+          <div class="moat-desc">繁體中文介面 + 台灣客服<br><br>本土獸醫院 B2B 通路深度綁定<br>在地數據、在地社群廣播<br><br>毛孩走失通報整合台灣社群生態</div>
+        </div>
+      </div>
+      <div class="core-message">
+        核心主張：NFC 吊牌是取得初始用戶的工具，平台生態才是持續獲利的資產
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: BIZ MODEL -->
+  <div class="slide" id="s4">
+    <div class="slide-inner" style="padding-bottom:80px">
+      <div class="slide-tag">04 / 商業模式</div>
+      <div class="slide-title">五條收入流</div>
+      <div class="slide-sub">不提高吊牌售價的前提下，平台生態帶來多層收益</div>
+      <div class="stream-list" id="streamList">
+        <div class="stream-item" style="--accent:#1b4f72">
+          <div style="width:4px;height:100%;position:absolute;left:0;background:#1b4f72;border-radius:4px 0 0 4px"></div>
+          <div class="s-label">吊牌硬體銷售</div>
+          <div class="s-bar-wrap"><div class="s-bar" data-w="82" style="background:var(--navy2);border:1px solid rgba(0,180,198,0.3)"></div></div>
+          <div class="s-range">$200–400萬/年</div>
+          <div class="s-margin">毛利 55%</div>
+        </div>
+        <div class="stream-item">
+          <div style="width:4px;height:100%;position:absolute;left:0;background:var(--teal);border-radius:4px 0 0 4px"></div>
+          <div class="s-label">B2B 獸醫院白牌授權</div>
+          <div class="s-bar-wrap"><div class="s-bar" data-w="68" style="background:rgba(0,180,198,0.3)"></div></div>
+          <div class="s-range">$30–80萬/年</div>
+          <div class="s-margin" style="color:var(--mint)">毛利 75%</div>
+        </div>
+        <div class="stream-item">
+          <div style="width:4px;height:100%;position:absolute;left:0;background:var(--mint);border-radius:4px 0 0 4px"></div>
+          <div class="s-label">寵物保險導流分潤</div>
+          <div class="s-bar-wrap"><div class="s-bar" data-w="52" style="background:rgba(0,232,198,0.3)"></div></div>
+          <div class="s-range">$10–30萬/年</div>
+          <div class="s-margin" style="color:var(--mint)">毛利 95%</div>
+        </div>
+        <div class="stream-item">
+          <div style="width:4px;height:100%;position:absolute;left:0;background:var(--amber);border-radius:4px 0 0 4px"></div>
+          <div class="s-label">選品電商聯盟行銷</div>
+          <div class="s-bar-wrap"><div class="s-bar" data-w="60" style="background:rgba(255,179,71,0.3)"></div></div>
+          <div class="s-range">$15–40萬/年</div>
+          <div class="s-margin">毛利 40%</div>
+        </div>
+        <div class="stream-item">
+          <div style="width:4px;height:100%;position:absolute;left:0;background:#a78bfa;border-radius:4px 0 0 4px"></div>
+          <div class="s-label">掃描頁廣告位</div>
+          <div class="s-bar-wrap"><div class="s-bar" data-w="36" style="background:rgba(167,139,250,0.3)"></div></div>
+          <div class="s-range">$5–15萬/年</div>
+          <div class="s-margin" style="color:var(--mint)">毛利 90%+</div>
+        </div>
+      </div>
+      <div class="biz-total">
+        <div class="tl">Y2 平台總收入潛力（5,000 用戶基數）</div>
+        <div class="tv">$265–585 萬</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: PROFIT -->
+  <div class="slide" id="s5">
+    <div class="slide-inner">
+      <div class="slide-tag">05 / 利潤結構</div>
+      <div class="slide-title">單品成本 × 年度情境</div>
+      <div class="profit-grid">
+        <div>
+          <div style="font-size:12px;color:var(--teal);letter-spacing:2px;font-weight:700;margin-bottom:16px;font-family:'Space Mono',monospace">吊牌成本結構（均價 $399）</div>
+          <div class="cost-breakdown">
+            <div class="cost-row"><span>硬體代工（NFC + 矽膠）</span><span class="cv" style="color:var(--gray)">$40–70</span></div>
+            <div class="cost-row"><span>雲端平台攤提</span><span class="cv" style="color:var(--gray)">$15–25</span></div>
+            <div class="cost-row"><span>包裝 + 物流</span><span class="cv" style="color:var(--gray)">$30–45</span></div>
+            <div class="cost-row"><span>通路手續費</span><span class="cv" style="color:var(--gray)">$30–50</span></div>
+            <div class="cost-row highlight"><span style="font-weight:700">毛利</span><span class="cv" style="color:var(--mint)">$180–250</span></div>
+          </div>
+          <div style="margin-top:20px;padding:14px;background:rgba(0,232,198,0.06);border:1px solid rgba(0,232,198,0.2);border-radius:10px">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--mint)">45–65%</div>
+            <div style="font-size:11px;color:var(--gray);margin-top:4px">硬體毛利率；軟體服務毛利 80–95%</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--teal);letter-spacing:2px;font-weight:700;margin-bottom:16px;font-family:'Space Mono',monospace">年度淨利情境</div>
+          <div class="scenario-stack">
+            <div class="scenario sc-bear">
+              <div class="sc-label">保守情境</div>
+              <div class="sc-rev">$210 萬</div>
+              <div class="sc-detail">5,000 組 · 淨利率 25% · 淨利約 52 萬</div>
+            </div>
+            <div class="scenario sc-base">
+              <div class="sc-label">基準情境</div>
+              <div class="sc-rev">$750 萬</div>
+              <div class="sc-detail">12,000 組 + 軟體升級 · 淨利率 35% · 淨利 262 萬</div>
+            </div>
+            <div class="scenario sc-bull">
+              <div class="sc-label">樂觀情境</div>
+              <div class="sc-rev">$2,400 萬</div>
+              <div class="sc-detail">30,000 組 + B2B + 訂閱 · 淨利率 42%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: AI -->
+  <div class="slide" id="s6">
+    <div class="slide-inner" style="padding-bottom:80px">
+      <div class="slide-tag">06 / AI 驅動營運</div>
+      <div class="slide-title">1 人操盤全局</div>
+      <div class="slide-sub">60–70% 工作量由 AI 取代，年省 $25–50 萬人力成本</div>
+      <div class="ai-grid">
+        <div class="ai-row">
+          <div class="ai-icon-wrap" style="background:rgba(0,232,198,0.1)">✍️</div>
+          <div><div class="ai-area">品牌文案 + 社群設計</div><div class="ai-tool">Claude · Canva AI · Midjourney</div></div>
+          <div class="ai-saving">省 $7–13萬/年</div>
+          <div class="ai-pct" style="background:rgba(0,232,198,0.15);color:var(--mint)">80%</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-icon-wrap" style="background:rgba(0,180,198,0.1)">🤖</div>
+          <div><div class="ai-area">客服自動回覆</div><div class="ai-tool">Line Bot + n8n AI 串接</div></div>
+          <div class="ai-saving">省 $1.5萬/月</div>
+          <div class="ai-pct" style="background:rgba(0,180,198,0.15);color:var(--teal)">80%</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-icon-wrap" style="background:rgba(255,179,71,0.1)">📦</div>
+          <div><div class="ai-area">訂單 + 出貨全自動化</div><div class="ai-tool">n8n / Make.com 工作流</div></div>
+          <div class="ai-saving">省 2–3 hr/天</div>
+          <div class="ai-pct" style="background:rgba(255,179,71,0.15);color:var(--amber)">100%</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-icon-wrap" style="background:rgba(167,139,250,0.1)">📊</div>
+          <div><div class="ai-area">廣告投放優化 + 數據分析</div><div class="ai-tool">Meta Advantage+ · GA4 AI</div></div>
+          <div class="ai-saving">CPA 降 20–30%</div>
+          <div class="ai-pct" style="background:rgba(167,139,250,0.15);color:#a78bfa">自動</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-icon-wrap" style="background:rgba(255,107,138,0.1)">⚙️</div>
+          <div><div class="ai-area">後端開發輔助</div><div class="ai-tool">Claude Code · Cursor</div></div>
+          <div class="ai-saving">省 $10–20萬外包費</div>
+          <div class="ai-pct" style="background:rgba(255,107,138,0.15);color:var(--rose)">+40%效率</div>
+        </div>
+      </div>
+      <div class="ai-summary">
+        <div class="ai-sum-card"><div class="n">60–70%</div><div class="l">工作量可取代</div></div>
+        <div class="ai-sum-card"><div class="n">$25–50萬</div><div class="l">年節省人力費用</div></div>
+        <div class="ai-sum-card"><div class="n">4–6 個月</div><div class="l">回本時間縮短</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: COST -->
+  <div class="slide" id="s7">
+    <div class="slide-inner">
+      <div class="slide-tag">07 / 啟動成本</div>
+      <div class="slide-title">精簡路線 $60–80 萬啟動</div>
+      <div class="slide-sub">建議備齊 $120 萬保守操盤</div>
+      <div class="cost-bars">
+        <div class="cbar-item">
+          <div class="cbar-header"><div class="cbar-label">技術開發（PWA + Line Bot + 後端）</div><div class="cbar-amt">$28–45 萬</div></div>
+          <div class="cbar-track"><div class="cbar-fill" data-w="80" style="background:rgba(13,79,114,0.8)">含後台、會員系統、Line 通知串接</div></div>
+        </div>
+        <div class="cbar-item">
+          <div class="cbar-header"><div class="cbar-label">首批備料（1,000 組含模具）</div><div class="cbar-amt">$12–22 萬</div></div>
+          <div class="cbar-track"><div class="cbar-fill" data-w="55" style="background:rgba(0,180,198,0.6)">矽膠 + NFC 晶片 + 精緻包裝</div></div>
+        </div>
+        <div class="cbar-item">
+          <div class="cbar-header"><div class="cbar-label">前 6 個月行銷（KOL + 廣告 + 展覽）</div><div class="cbar-amt">$15–30 萬</div></div>
+          <div class="cbar-track"><div class="cbar-fill" data-w="65" style="background:rgba(255,179,71,0.5)">3–5 位中型寵物 KOL + Meta 廣告</div></div>
+        </div>
+        <div class="cbar-item">
+          <div class="cbar-header"><div class="cbar-label">法務 + 商標 + 預備金</div><div class="cbar-amt">$5–10 萬</div></div>
+          <div class="cbar-track"><div class="cbar-fill" data-w="28" style="background:rgba(112,144,160,0.4)">含不可預期緩衝 10–15%</div></div>
+        </div>
+      </div>
+      <div class="path-compare">
+        <div class="path-card path-lean">
+          <h4>精簡路線（推薦）</h4>
+          <div class="pv">$60–80 萬</div>
+          <p>PWA 取代原生 App 省 $30–60 萬<br>蝦皮 + 官網主通路，KOL 口碑驅動<br>目標 M14–M8 回本（視槓桿）</p>
+        </div>
+        <div class="path-card path-full">
+          <h4>完整品牌路線</h4>
+          <div class="pv">$150–200 萬</div>
+          <p>原生 iOS + Android App<br>首批 3,000 組 + B2B 獸醫批量<br>目標 M12 損益平衡，需外部融資</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: TIMELINE -->
+  <div class="slide" id="s8">
+    <div class="slide-inner">
+      <div class="slide-tag">08 / 回本路徑</div>
+      <div class="slide-title">三大槓桿壓縮回本至 M8</div>
+      <div class="timeline-section">
+        <div class="tl-track">
+          <div class="tl-line"></div>
+          <div class="tl-progress" id="tlProgress"></div>
+          <div class="tl-nodes">
+            <div class="tl-node done">
+              <div class="tl-month">M1–M2</div>
+              <div class="tl-dot"></div>
+              <div class="tl-title">開發 + 備料</div>
+              <div class="tl-note">支出 45 萬</div>
+            </div>
+            <div class="tl-node done">
+              <div class="tl-month">M3</div>
+              <div class="tl-dot"></div>
+              <div class="tl-title">B2B 鋪貨</div>
+              <div class="tl-note">回收 $10–20 萬</div>
+            </div>
+            <div class="tl-node done">
+              <div class="tl-month">M4</div>
+              <div class="tl-dot"></div>
+              <div class="tl-title">KOL 上市</div>
+              <div class="tl-note">月收 $20–30 萬</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-month">M5–M6</div>
+              <div class="tl-dot"></div>
+              <div class="tl-title">選品電商</div>
+              <div class="tl-note">月收 $35–50 萬</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-month">M7–M8</div>
+              <div class="tl-dot"></div>
+              <div class="tl-title">累計回本</div>
+              <div class="tl-note">保險導流啟動</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-month">M9+</div>
+              <div class="tl-dot"></div>
+              <div class="tl-title">純利潤疊加</div>
+              <div class="tl-note">廣告 + 數據層</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--teal);letter-spacing:2px;font-weight:700;margin-bottom:14px;font-family:'Space Mono',monospace">三大加速槓桿</div>
+          <div class="lever-grid">
+            <div class="lever-card lever-1">
+              <div class="lever-tag">槓桿 01</div>
+              <div class="lever-title">B2B 先行</div>
+              <div class="lever-desc">10–20 家獸醫院批量鋪貨，一次回收 $10–20 萬現金流，無需品牌知名度即可成交</div>
+            </div>
+            <div class="lever-card lever-2">
+              <div class="lever-tag">槓桿 02</div>
+              <div class="lever-title">預購訂閱</div>
+              <div class="lever-desc">$199 年費會員預購方案，300 組預購 = 回收 $6 萬，提前收款支付備料費</div>
+            </div>
+            <div class="lever-card lever-3">
+              <div class="lever-tag">槓桿 03</div>
+              <div class="lever-title">OEM 授權</div>
+              <div class="lever-desc">讓寵物店 / 診所貼牌銷售，10 個夥伴等同 10 個業務員，擴規模不增人力</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: CLOSE -->
+  <div class="slide" id="s9">
+    <div class="close-content">
+      <div class="close-left">
+        <div class="close-headline">現在是<br><em>最好的</em><br>時機</div>
+        <div class="close-sub">法規推動 · 市場空白 · AI 降低門檻</div>
+        <ul class="summary-list" id="sumList">
+          <li><div class="sum-dot"></div><span>台灣 279 萬犬貓，<strong>零本土 NFC 識別品牌</strong></span></li>
+          <li><div class="sum-dot"></div><span>吊牌是入場券，<strong>平台生態是持續獲利引擎</strong></span></li>
+          <li><div class="sum-dot"></div><span>AI 取代 60–70% 工作量，<strong>1 人可操盤全局</strong></span></li>
+          <li><div class="sum-dot"></div><span><strong>$60–80 萬精簡啟動</strong>，B2B 槓桿壓縮至 M8 回本</span></li>
+          <li><div class="sum-dot"></div><span>五條收入流，Year 2 總收入潛力 <strong>$265–585 萬</strong></span></li>
+        </ul>
+      </div>
+      <div class="close-right">
+        <div class="close-stat"><div class="cn">279萬</div><div class="cl">潛在目標用戶</div></div>
+        <div class="close-stat"><div class="cn">M8</div><div class="cl">最快回本月份</div></div>
+        <div class="close-stat"><div class="cn">$585萬</div><div class="cl">Year 2 收入上限</div></div>
+        <div class="close-stat"><div class="cn">1人</div><div class="cl">AI 輔助即可操盤</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<div id="nav">
+  <button id="btn-prev" onclick="goTo(current-1)">← 上一頁</button>
+  <div id="dots"></div>
+  <span id="slide-counter">1 / 10</span>
+  <button id="btn-next" onclick="goTo(current+1)">下一頁 →</button>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────
+const TOTAL = 10;
+let current = 0;
+
+// ── Cursor ─────────────────────────────────────────
+const cur = document.getElementById('cursor');
+const dot = document.getElementById('cursor-dot');
+document.addEventListener('mousemove', e => {
+  cur.style.left = (e.clientX - 9) + 'px';
+  cur.style.top  = (e.clientY - 9) + 'px';
+  dot.style.left = (e.clientX - 2) + 'px';
+  dot.style.top  = (e.clientY - 2) + 'px';
+});
+document.querySelectorAll('button,a,.cta-btn,.stat-card,.comp-card,.moat-card,.scenario,.lever-card,.tl-node,.cstat').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.transform = 'scale(2)'; cur.style.borderColor = 'var(--mint)'; });
+  el.addEventListener('mouseleave', () => { cur.style.transform = 'scale(1)'; cur.style.borderColor = 'var(--teal)'; });
+});
+
+// ── Dots ───────────────────────────────────────────
+const dotsWrap = document.getElementById('dots');
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsWrap.appendChild(d);
+}
+
+// ── Navigation ─────────────────────────────────────
+function goTo(n) {
+  if (n < 0 || n >= TOTAL) return;
+  const slides = document.querySelectorAll('.slide');
+  slides[current].classList.remove('active');
+  slides[current].classList.add('prev');
+  setTimeout(() => slides[current - (current > n ? 0 : 0)].classList.remove('prev'), 600);
+  slides.forEach(s => s.classList.remove('prev'));
+
+  current = n;
+  slides[current].classList.add('active');
+
+  // dots
+  dotsWrap.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === current));
+  document.getElementById('slide-counter').textContent = (current + 1) + ' / ' + TOTAL;
+
+  // progress bar
+  document.getElementById('progress-bar').style.width = ((current + 1) / TOTAL * 100) + '%';
+
+  // per-slide triggers
+  if (n === 4) triggerStreams();
+  if (n === 7) triggerCostBars(), triggerTimeline();
+  if (n === 9) triggerSummary();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1);
+});
+
+// ── Particle Canvas (Cover) ─────────────────────────
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let pts = [];
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (let i = 0; i < 80; i++) {
+  pts.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.5 + 0.5,
+    alpha: Math.random() * 0.5 + 0.1,
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  pts.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,180,198,${p.alpha})`;
+    ctx.fill();
+  });
+  // connections
+  for (let i = 0; i < pts.length; i++) {
+    for (let j = i + 1; j < pts.length; j++) {
+      const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.strokeStyle = `rgba(0,180,198,${0.08 * (1 - dist/120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// Counter animation on cover
+function animateCounter(el, target, dec) {
+  let current = 0;
+  const step = target / 60;
+  const timer = setInterval(() => {
+    current += step;
+    if (current >= target) { current = target; clearInterval(timer); }
+    el.textContent = dec ? current.toFixed(dec) : Math.round(current);
+  }, 20);
+}
+document.querySelectorAll('.cstat .num').forEach(el => {
+  const t = parseFloat(el.dataset.target);
+  const d = el.dataset.dec ? parseInt(el.dataset.dec) : 0;
+  setTimeout(() => animateCounter(el, t, d), 1200);
+});
+
+// ── Stream bars (Slide 4) ───────────────────────────
+function triggerStreams() {
+  document.querySelectorAll('.s-bar').forEach((b, i) => {
+    setTimeout(() => { b.style.width = b.dataset.w + '%'; }, i * 120);
+  });
+}
+
+// ── Cost bars (Slide 7) ─────────────────────────────
+function triggerCostBars() {
+  document.querySelectorAll('.cbar-fill').forEach((b, i) => {
+    setTimeout(() => { b.style.width = b.dataset.w + '%'; }, i * 200);
+  });
+}
+
+// ── Timeline (Slide 8) ──────────────────────────────
+function triggerTimeline() {
+  setTimeout(() => {
+    document.getElementById('tlProgress').style.width = '43%';
+  }, 300);
+}
+
+// ── Summary list (Slide 9) ──────────────────────────
+function triggerSummary() {
+  document.querySelectorAll('#sumList li').forEach((li, i) => {
+    setTimeout(() => li.classList.add('visible'), 200 + i * 180);
+  });
+}
+</script>
+</body>
+</html>

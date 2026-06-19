@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工地點工派工與工時結算系統 | Daniel Cheng</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07111d;--bg2:#0a1828;
+  --ink:#dbeafe;--ink2:#93c5fd;--muted:rgba(219,234,254,0.66);
+  --blue:#3b82f6;--blue2:#60a5fa;--line:rgba(96,165,250,0.18);--line2:rgba(96,165,250,0.34);
+}
+html,body{min-height:100%}
+body{
+  font-family:'Manrope','Noto Sans TC','Segoe UI',Arial,sans-serif;
+  background:
+    radial-gradient(circle at top left,rgba(59,130,246,0.14),transparent 28%),
+    radial-gradient(circle at top right,rgba(14,165,233,0.08),transparent 24%),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  color:var(--ink);
+  padding:32px 20px 60px;
+}
+.page-shell{max-width:1180px;margin:0 auto}
+.deck-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px;flex-wrap:wrap}
+.deck-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(59,130,246,0.12);border:1px solid var(--line2);
+  color:var(--ink2);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px
+}
+.deck-kicker-dot{width:8px;height:8px;border-radius:50%;background:var(--blue2)}
+.deck-title{font-size:clamp(28px,4.4vw,46px);font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:10px}
+.deck-title em{font-style:normal;color:var(--blue2)}
+.deck-sub{max-width:700px;font-size:14px;line-height:1.8;color:var(--muted)}
+.deck-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;align-self:flex-end}
+.deck-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 18px;border-radius:999px;text-decoration:none;
+  font-size:12px;font-weight:800;letter-spacing:.05em;
+  transition:transform .18s,box-shadow .18s,background .18s;cursor:pointer;border:none;
+}
+.deck-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.btn-secondary{background:rgba(59,130,246,0.1);border:1px solid var(--line2);color:var(--ink2)}
+.section-label{
+  font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--blue2);margin:36px 0 16px;display:flex;align-items:center;gap:14px
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--line)}
+.slides-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.slide-card{
+  background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);
+  border:1px solid var(--line);border-radius:16px;
+  padding:30px 30px 28px;position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.slide-card:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.slide-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--blue2));
+  opacity:0;transition:opacity .2s;
+}
+.slide-card:hover::before{opacity:1}
+.slide-cover{
+  background:linear-gradient(135deg,rgba(59,130,246,0.18),rgba(15,23,42,0.3));
+  border:1px solid var(--line2);border-radius:16px;
+  padding:48px 44px;margin-bottom:20px;position:relative;overflow:hidden;
+  grid-column:1/-1;
+}
+.slide-cover::after{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(96,165,250,0.15),transparent 70%);
+}
+.card-num{
+  font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--blue2);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.card-num span{
+  background:rgba(59,130,246,0.15);border:1px solid var(--line2);
+  border-radius:999px;padding:3px 10px;
+}
+.card-tag{
+  display:inline-block;font-size:10px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--blue2);
+  background:rgba(59,130,246,0.1);border:1px solid var(--line);
+  border-radius:999px;padding:3px 10px;margin-bottom:14px
+}
+h2{font-size:clamp(20px,2vw,26px);font-weight:800;line-height:1.22;letter-spacing:-.025em;margin-bottom:14px;color:var(--ink);max-width:16ch;text-wrap:balance}
+h3{font-size:13px;font-weight:700;color:var(--ink2);margin-bottom:8px}
+p{font-size:14px;line-height:1.9;color:var(--muted);max-width:56ch}
+ul,ol{margin-left:18px}
+li{font-size:13.5px;line-height:1.9;color:var(--muted);margin-bottom:2px}
+li strong,b,strong{color:#eff6ff}
+.callout{
+  background:rgba(59,130,246,0.08);border-left:3px solid var(--blue);
+  border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;
+}
+.callout p{font-size:13px;color:#eff6ff;margin:0}
+.inner-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.inner-box{
+  background:rgba(255,255,255,0.04);border:1px solid var(--line);
+  border-radius:10px;padding:14px 14px 12px;
+}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.badge{
+  background:rgba(59,130,246,0.15);border:1px solid var(--line2);
+  color:var(--ink2);font-size:11.5px;font-weight:700;
+  padding:4px 12px;border-radius:999px
+}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:12px 0}
+.flow-step{
+  background:rgba(59,130,246,0.18);border:1px solid var(--line2);
+  color:#eff6ff;font-size:11.5px;font-weight:700;
+  padding:6px 12px;border-radius:8px;text-align:center;line-height:1.4;
+}
+.flow-arrow{color:var(--blue2);font-size:16px;font-weight:800}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0}
+.data-table th{
+  background:rgba(59,130,246,0.18);color:var(--ink2);
+  padding:8px 12px;text-align:left;font-weight:700;font-size:11.5px;letter-spacing:.04em;
+}
+.data-table td{
+  padding:8px 12px;border-bottom:1px solid var(--line);color:var(--muted);
+  vertical-align:top;
+}
+.data-table tr:last-child td{border-bottom:none}
+.stat-row{display:flex;gap:10px;margin:14px 0}
+.stat{flex:1;background:rgba(59,130,246,0.1);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+.stat .num{font-size:26px;font-weight:800;color:var(--blue2);display:block;line-height:1.1}
+.stat .lbl{font-size:10.5px;color:var(--muted);margin-top:4px;display:block;line-height:1.4}
+.cover-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 16px;border-radius:999px;margin-bottom:18px;
+  background:rgba(59,130,246,0.15);border:1px solid var(--line2);
+  color:var(--ink2);font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+}
+.cover-title{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:16px}
+.cover-title em{font-style:normal;color:var(--blue2)}
+.cover-sub{font-size:15px;line-height:1.85;color:var(--muted);max-width:620px}
+.cover-deco{width:48px;height:3px;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:2px;margin:18px 0}
+.span2{grid-column:span 2}
+@media(max-width:1080px){
+  .slides-grid{grid-template-columns:1fr}
+  .span2{grid-column:span 1}
+  h2{max-width:none}
+}
+@media(max-width:760px){
+  .inner-grid{grid-template-columns:1fr}
+  .stat-row{flex-direction:column}
+  .slide-card{padding:26px 22px 24px}
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <div class="deck-header">
+    <div>
+      <div class="deck-kicker"><span class="deck-kicker-dot"></span>Daniel Cheng × Workflow Design</div>
+      <h1 class="deck-title">工地點工派工與<br><em>工時結算系統</em></h1>
+      <p class="deck-sub">把原本依靠電話、LINE 與人工整理的現場點工流程，重整成可查詢、可統計、可支援月底結算的系統化方案，展示我如何把業務問題轉成流程與資料結構。</p>
+    </div>
+    <div class="deck-actions">
+      <a href="index.html" class="deck-btn btn-secondary">← 返回首頁</a>
+    </div>
+  </div>
+
+  <div class="slide-cover">
+    <div class="cover-kicker"><span class="deck-kicker-dot"></span>Project Overview</div>
+    <div class="cover-title">先把現場流程拆清楚<br><em>再把管理需求變成系統</em></div>
+    <div class="cover-deco"></div>
+    <p class="cover-sub">這個案例的核心不是單純做一個派工頁面，而是從工地點工、工程師調度、工人出勤到月底工時計算，重新整理成一套能被執行與管理的流程邏輯。</p>
+  </div>
+
+  <div class="section-label">Case Breakdown Slides 01 – 10</div>
+  <div class="slides-grid">
+    <div class="slide-card">
+      <div class="card-num"><span>01</span></div>
+      <div class="card-tag">專案定位</div>
+      <h2>工地點工派工與工時結算系統</h2>
+      <p>以工程與清潔現場的人力調度為核心，把派工、出勤紀錄與工時計帳整合成單一工作流，讓前端建立需求、後端整理結算不再依靠零散訊息與人工對帳。</p>
+      <div class="badges" style="margin-top:14px">
+        <span class="badge">派工流程</span>
+        <span class="badge">出勤紀錄</span>
+        <span class="badge">工時計帳</span>
+        <span class="badge">欄位設計</span>
+        <span class="badge">查詢邏輯</span>
+        <span class="badge">流程重構</span>
+      </div>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>02</span></div>
+      <div class="card-tag">問題背景</div>
+      <h2>痛點不在單一工具<br>而在資訊分散</h2>
+      <div class="inner-grid">
+        <div class="inner-box">
+          <h3>原本的處理方式</h3>
+          <ol style="margin-top:6px">
+            <li>前端顧問以電話或 LINE 點工</li>
+            <li>工程師再逐一確認人力</li>
+            <li>工人資訊散在聊天紀錄</li>
+            <li>月底重新整理工時與單價</li>
+            <li>會計端另外做人工結算</li>
+          </ol>
+        </div>
+        <div class="inner-box" style="display:flex;flex-direction:column;justify-content:center">
+          <h3>核心問題</h3>
+          <div class="callout" style="margin-top:8px">
+            <p>同一筆派工需求，前端、現場與後端看到的是不同資訊版本，導致溝通成本高、追蹤困難、月底結算更慢。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>03</span></div>
+      <div class="card-tag">問題拆解</div>
+      <h2>我先拆角色與節點<br>再決定系統結構</h2>
+      <p>這個專案的第一步不是畫頁面，而是先把現場流程拆成誰在什麼時候要知道什麼資訊，讓後面的系統邏輯有清楚基礎。</p>
+      <div class="badges">
+        <span class="badge">顧問</span>
+        <span class="badge">工程師</span>
+        <span class="badge">工人</span>
+        <span class="badge">會計</span>
+        <span class="badge">需求建立</span>
+        <span class="badge">派工</span>
+        <span class="badge">出勤</span>
+        <span class="badge">結算</span>
+      </div>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>04</span></div>
+      <div class="card-tag">流程重構</div>
+      <h2>把零散協調流程<br>重整成單一路徑</h2>
+      <p>原本需求建立、調度與月底統計是分開處理的，我把它們整理成一條前後相接的流程，讓同一筆資料可以一路被沿用。</p>
+      <div class="flow">
+        <div class="flow-step">需求建立</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">工程師負責</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">工種與人數</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">工人派遣</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">工時與結算</div>
+      </div>
+      <div class="callout">
+        <p>重點不是把 LINE 搬到網頁上，而是讓資料從一開始就能支援後續管理與結算。</p>
+      </div>
+    </div>
+
+    <div class="slide-card span2">
+      <div class="card-num"><span>05</span></div>
+      <div class="card-tag">前後對比</div>
+      <h2>Before / After：從訊息協調到資料流</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>面向</th><th>Before</th><th>After</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>需求建立</td><td>電話、LINE 臨時溝通</td><td>統一以網頁建立派工需求</td></tr>
+          <tr><td>人力資訊</td><td>分散在聊天與人工記錄</td><td>集中於同一筆派工資料</td></tr>
+          <tr><td>工程師管理</td><td>逐筆回頭確認</td><td>可直接依日期、工地、工程師查詢</td></tr>
+          <tr><td>月底結算</td><td>重新整理工時與單價</td><td>前段資料可直接支援統計與作帳</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>06</span></div>
+      <div class="card-tag">資料設計</div>
+      <h2>先把欄位定義清楚<br>查詢與統計才成立</h2>
+      <p>我先整理出這套系統最核心的欄位，確保同一筆資料能同時支援調度、現場追蹤與會計結算。</p>
+      <div class="badges">
+        <span class="badge">日期</span>
+        <span class="badge">工地</span>
+        <span class="badge">工程師</span>
+        <span class="badge">工種</span>
+        <span class="badge">人數</span>
+        <span class="badge">派工名單</span>
+        <span class="badge">工時</span>
+        <span class="badge">單價</span>
+      </div>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>07</span></div>
+      <div class="card-tag">查詢邏輯</div>
+      <h2>管理需求要先被翻成<br>查詢維度</h2>
+      <p>這個專案的重要價值之一，是把「之後要怎麼找資料」提前放進設計。查詢不是附屬功能，而是一開始就需要考慮的管理需求。</p>
+      <div class="badges">
+        <span class="badge">日期</span>
+        <span class="badge">工地</span>
+        <span class="badge">工程師</span>
+        <span class="badge">工人</span>
+        <span class="badge">工種</span>
+        <span class="badge">異常紀錄</span>
+      </div>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>08</span></div>
+      <div class="card-tag">系統價值</div>
+      <h2>同一套資料同時支援<br>前端派工與後端作帳</h2>
+      <p>這套系統不是只幫前端更快派工，而是讓同一筆資訊在不同角色間共用，減少重複溝通與二次整理。</p>
+      <table class="data-table">
+        <thead>
+          <tr><th>角色</th><th>系統價值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>前端顧問</td><td>更快建立派工需求與確認安排</td></tr>
+          <tr><td>工程師</td><td>掌握工地、人數、工種與人員配置</td></tr>
+          <tr><td>後端會計</td><td>可依現有資料直接做工時統計與結算</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>09</span></div>
+      <div class="card-tag">AI 協作</div>
+      <h2>AI 用來加速原型與整理<br>但判斷仍由我主導</h2>
+      <p>這個案例也展示我如何使用 AI。AI 協助的是文案整理、原型產出與頁面結構收斂，但問題定義、流程取捨與最終敘事由我負責。</p>
+      <div class="badges">
+        <span class="badge">需求重述</span>
+        <span class="badge">流程整理</span>
+        <span class="badge">HTML 原型</span>
+        <span class="badge">頁面敘事</span>
+      </div>
+    </div>
+
+    <div class="slide-card">
+      <div class="card-num"><span>10</span></div>
+      <div class="card-tag">價值總結</div>
+      <h2>這個案例展示的不是單純做頁面<br>而是把流程轉成系統方案</h2>
+      <div class="stat-row">
+        <div class="stat"><span class="num">6</span><span class="lbl">流程模組</span></div>
+        <div class="stat"><span class="num">3</span><span class="lbl">核心能力主軸</span></div>
+        <div class="stat"><span class="num">1</span><span class="lbl">完整案例頁輸出</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>廈門銀行專案簡報 | 鄭嘉雄</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --oc-bg:#0d1b2a;--oc-bg2:#111f30;--oc-bg3:#162840;
+  --oc-teal:#2d8b8b;--oc-teal2:#3aa3a3;--oc-seafoam:#a8dadc;
+  --oc-cream:#f1faee;--oc-muted:rgba(168,218,220,0.6);
+  --oc-border:rgba(45,139,139,0.22);--oc-border2:rgba(45,139,139,0.4);
+  --page-bg:#08121c;--page-bg2:#0e1d2b;
+}
+html,body{min-height:100%}
+body{
+  font-family:'Manrope','Noto Sans TC','Segoe UI',Arial,sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(45,139,139,0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(58,163,163,0.12), transparent 24%),
+    linear-gradient(180deg, var(--page-bg) 0%, var(--page-bg2) 100%);
+  color:var(--oc-cream);
+  padding:32px 20px 48px;
+}
+.page-shell{max-width:1180px;margin:0 auto}
+.deck-header{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  margin-bottom:24px;
+}
+.deck-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(45,139,139,0.12);border:1px solid var(--oc-border2);
+  color:var(--oc-seafoam);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.deck-kicker-dot{width:8px;height:8px;border-radius:50%;background:var(--oc-teal)}
+.deck-title{font-size:clamp(28px,4.4vw,46px);font-weight:800;line-height:1.02;letter-spacing:-.03em;margin-bottom:10px}
+.deck-title em{font-style:normal;color:var(--oc-teal2)}
+.deck-sub{max-width:760px;font-size:14px;line-height:1.8;color:var(--oc-muted)}
+.deck-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.deck-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 18px;border-radius:999px;text-decoration:none;
+  font-size:12px;font-weight:800;letter-spacing:.05em;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.deck-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.deck-btn-primary{
+  background:var(--oc-teal);color:#fff;box-shadow:0 14px 30px rgba(45,139,139,0.22);
+}
+.deck-btn-primary:hover{background:var(--oc-teal2);transform:translateY(-1px)}
+.deck-btn-ghost{
+  border:1px solid var(--oc-border2);color:var(--oc-seafoam);background:rgba(255,255,255,0.03);
+}
+.deck-btn-ghost:hover{background:rgba(45,139,139,0.12);transform:translateY(-1px)}
+.deck-frame{
+  border:1px solid var(--oc-border);
+  border-radius:28px;
+  padding:18px;
+  background:rgba(255,255,255,0.03);
+  box-shadow:0 30px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  backdrop-filter:blur(12px);
+}
+.sw{background:var(--oc-bg);min-height:580px;position:relative;overflow:hidden;border-radius:20px}
+.slide{display:none;min-height:580px;flex-direction:column}
+.slide.active{display:flex}
+.prog{position:absolute;top:0;left:0;height:3px;background:var(--oc-teal);z-index:30;transition:width .4s}
+.nav{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(8,14,22,0.9);z-index:20;border-top:1px solid var(--oc-border)}
+.nbtn{background:none;border:1px solid var(--oc-border2);color:var(--oc-seafoam);font-size:12px;padding:5px 16px;border-radius:20px;cursor:pointer}
+.nbtn:hover{background:rgba(45,139,139,0.15)}
+.dots{display:flex;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(168,218,220,0.25);border:none;cursor:pointer}
+.dot.on{background:var(--oc-teal)}
+.ncount{font-size:11px;color:var(--oc-muted);min-width:40px;text-align:center}
+.stag{font-size:10px;letter-spacing:2.5px;color:var(--oc-teal);text-transform:uppercase;margin-bottom:5px}
+.stitle{font-size:23px;font-weight:700;color:var(--oc-cream);line-height:1.2}
+.stitle em{color:var(--oc-teal);font-style:normal}
+.shdr{margin-bottom:18px}
+.card{background:rgba(255,255,255,0.04);border:1px solid var(--oc-border);border-radius:12px;padding:14px 16px}
+.card-teal{background:rgba(45,139,139,0.09);border:1px solid var(--oc-border2)}
+.lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--oc-muted);margin-bottom:3px}
+.val{font-size:13px;color:var(--oc-cream);font-weight:500}
+.val-big{font-size:26px;font-weight:800;color:var(--oc-teal)}
+.val-md{font-size:18px;font-weight:700;color:var(--oc-seafoam)}
+.sub{font-size:12px;color:rgba(168,218,220,0.5);margin-top:2px}
+.pill{display:inline-block;background:rgba(45,139,139,0.18);border:1px solid var(--oc-border2);color:var(--oc-seafoam);font-size:11px;padding:3px 10px;border-radius:20px}
+.pill-red{background:rgba(220,80,60,0.15);border-color:rgba(220,80,60,0.3);color:#f09595}
+.pill-amber{background:rgba(220,160,40,0.15);border-color:rgba(220,160,40,0.3);color:#fac775}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.sep{border:none;border-top:1px solid var(--oc-border);margin:10px 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bar-bg{background:rgba(255,255,255,0.06);border-radius:4px;height:8px;margin-top:4px}
+.bar-fill{height:8px;border-radius:4px;background:var(--oc-teal)}
+.bar-fill-warn{background:#c07a2a}
+.tl-line{width:2px;background:var(--oc-border2);margin:0 auto}
+.tl-dot{width:32px;height:32px;border-radius:50%;background:var(--oc-teal);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.chip{background:rgba(45,139,139,0.12);border:1px solid var(--oc-border);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--oc-seafoam);display:inline-flex;align-items:center;gap:5px}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--oc-teal);flex-shrink:0}
+.tab-row{display:flex;gap:8px;margin-bottom:16px}
+.tbtn{background:none;border:1px solid var(--oc-border);color:rgba(168,218,220,0.55);font-size:12px;padding:5px 14px;border-radius:20px;cursor:pointer}
+.tbtn.on{background:var(--oc-teal);color:var(--oc-cream);border-color:var(--oc-teal)}
+.panel{display:none}.panel.on{display:block}
+.icon-box{width:40px;height:40px;border-radius:10px;background:rgba(45,139,139,0.2);border:1px solid var(--oc-border2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-row{display:flex;gap:0;border:1px solid var(--oc-border);border-radius:10px;overflow:hidden}
+.stat-cell{flex:1;padding:12px 10px;text-align:center;border-right:1px solid var(--oc-border)}
+.stat-cell:last-child{border-right:none}
+.quote-bar{border-left:3px solid var(--oc-teal);border-radius:0;padding:10px 14px;background:rgba(45,139,139,0.07);margin-top:10px}
+.cross-tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--oc-teal);border:1px solid var(--oc-border2);padding:2px 8px;border-radius:12px;display:inline-block}
+@media (max-width: 900px){
+  body{padding:20px 14px 28px}
+  .deck-header{flex-direction:column;align-items:flex-start}
+  .deck-actions{justify-content:flex-start}
+  .deck-frame{padding:10px;border-radius:20px}
+}
+@media (max-width: 640px){
+  .deck-btn{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <div class="deck-header">
+    <div>
+      <div class="deck-kicker"><span class="deck-kicker-dot"></span>Xiamen Bank Project</div>
+      <h1 class="deck-title">廈門銀行台胞金融方案<br><em>專案簡報</em></h1>
+      <p class="deck-sub">保留原始簡報內容與操作邏輯，外層重新整理為正式展示頁，方便從個人網站導流、閱讀與分享。</p>
+    </div>
+    <div class="deck-actions">
+      <a class="deck-btn deck-btn-ghost" href="/" target="_self">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M21 12H9"/></svg>
+        返回首頁
+      </a>
+      <a class="deck-btn deck-btn-primary" href="mailto:aa751413609@gmail.com?subject=%E5%BB%88%E9%96%80%E9%8A%80%E8%A1%8C%E5%B0%88%E6%A1%88%E7%B0%A1%E5%A0%B1%E6%B4%BD%E8%AB%87">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+        聯絡我
+      </a>
+    </div>
+  </div>
+  <div class="deck-frame">
+
+<div class="sw" id="sw">
+<div class="prog" id="prog" style="width:16.6%"></div>
+
+<!-- SLIDE 1 COVER -->
+<div class="slide active" id="s1" style="background:var(--oc-bg);justify-content:center;align-items:center;padding:36px 28px 70px;text-align:center">
+  <div style="position:absolute;bottom:48px;left:0;right:0;height:90px;opacity:0.12">
+    <svg viewBox="0 0 700 90" preserveAspectRatio="none" style="width:100%;height:100%">
+      <path d="M0 55 Q175 10 350 55 Q525 100 700 55 L700 90 L0 90Z" fill="#2d8b8b"/>
+      <path d="M0 68 Q175 35 350 68 Q525 98 700 68 L700 90 L0 90Z" fill="#a8dadc" opacity="0.5"/>
+    </svg>
+  </div>
+  <div style="position:relative;z-index:5;max-width:560px">
+    <div style="margin-bottom:16px">
+      <span class="cross-tag">廈門銀行</span>&nbsp;&nbsp;<span style="color:var(--oc-muted);font-size:12px">×</span>&nbsp;&nbsp;<span class="cross-tag">台胞金融服務</span>
+    </div>
+    <div style="font-size:34px;font-weight:800;color:var(--oc-cream);line-height:1.2;margin-bottom:8px">台胞旅遊金融<br><span style="color:var(--oc-teal)">全方位解決方案</span></div>
+    <div style="font-size:14px;color:var(--oc-muted);margin-bottom:32px">跨越海峽的數位金融橋梁　｜　2024 戰略方案</div>
+    <div class="stat-row" style="max-width:480px;margin:0 auto 24px">
+      <div class="stat-cell"><div class="val-big">59.9<span style="font-size:14px">萬</span></div><div class="sub">2023上半年赴陸台胞</div></div>
+      <div class="stat-cell"><div class="val-big">86<span style="font-size:14px">%+</span></div><div class="sub">大陸行動支付普及率</div></div>
+      <div class="stat-cell"><div class="val-big">2</div><div class="sub">核心金融產品</div></div>
+      <div class="stat-cell"><div class="val-big">120<span style="font-size:14px">天</span></div><div class="sub">旅遊錢包效期</div></div>
+    </div>
+    <div class="row" style="justify-content:center">
+      <span class="pill">全數位開戶</span>
+      <span class="pill">無需居住證明</span>
+      <span class="pill">即刻行動支付</span>
+      <span class="pill">金馬特別禮遇</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2 MARKET -->
+<div class="slide" id="s2" style="background:var(--oc-bg2);padding:28px 24px 70px">
+  <div class="shdr"><div class="stag">01 市場洞察</div><div class="stitle">機遇識別與<em>核心痛點</em></div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card card-teal">
+      <div class="lbl">市場規模</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin:6px 0 2px"><span class="val-big">59.9</span><span style="color:var(--oc-seafoam);font-size:14px">萬人次</span></div>
+      <div class="sub">2023上半年台胞赴陸旅遊，位居出境目的地第二</div>
+      <div class="sep"></div>
+      <div class="lbl" style="margin-bottom:6px">行動支付滲透率</div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--oc-muted);margin-bottom:3px"><span>大陸市場</span><span>86%+</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:86%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--oc-muted);margin-top:6px;margin-bottom:3px"><span>台胞實際可用率</span><span>約 20%</span></div>
+      <div class="bar-bg"><div class="bar-fill bar-fill-warn" style="width:20%"></div></div>
+      <div class="quote-bar" style="margin-top:12px"><div style="font-size:12px;color:var(--oc-seafoam)">市場缺口超過 <strong>66%</strong>，代表龐大的未開發金融服務需求</div></div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="margin-bottom:10px">三大核心痛點</div>
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px">
+        <div class="icon-box"><span style="font-size:16px">🔒</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--oc-seafoam);margin-bottom:3px">開戶門檻過高</div>
+          <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6">一般銀行要求就業或居住證明，台灣旅客難以符合，直接阻斷金融服務入口</div>
+          <span class="pill-red" style="margin-top:5px;display:inline-block">高阻力</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px">
+        <div class="icon-box"><span style="font-size:16px">📱</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--oc-seafoam);margin-bottom:3px">支付斷層困境</div>
+          <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6">無大陸銀行卡無法完成微信支付 / 支付寶實名認證，旅遊消費場景嚴重受限</div>
+          <span class="pill-amber" style="margin-top:5px;display:inline-block">高頻痛點</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div class="icon-box"><span style="font-size:16px">💱</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--oc-seafoam);margin-bottom:3px">換匯成本高昂</div>
+          <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6">跨境取現手續費高，現金接受度持續下滑，旅遊資金管理效率低落</div>
+          <span class="pill-amber" style="margin-top:5px;display:inline-block">持續痛點</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="background:rgba(45,139,139,0.06)">
+    <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:12px;color:var(--oc-muted);flex:1;min-width:180px">廈門銀行作為最熟悉台胞需求的閩籍銀行，具備天然地緣優勢與政策支持，切入此市場具備獨特競爭壁壘。</div>
+      <div class="row">
+        <span class="pill">閩台地緣優勢</span>
+        <span class="pill">政策配套支持</span>
+        <span class="pill">小三通主要節點</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 PRODUCTS -->
+<div class="slide" id="s3" style="background:var(--oc-bg);padding:28px 24px 70px">
+  <div class="shdr"><div class="stag">02 核心產品</div><div class="stitle">雙軌<em>產品矩陣</em>設計</div></div>
+  <div class="tab-row">
+    <button class="tbtn on" id="t1" onclick="swTab(1)">旅遊錢包 Travel-E-Card</button>
+    <button class="tbtn" id="t2" onclick="swTab(2)">鬆 E 廈卡 儲蓄卡</button>
+    <button class="tbtn" id="t3" onclick="swTab(3)">產品比較</button>
+  </div>
+  <div class="panel on" id="p1">
+    <div class="card card-teal" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div class="icon-box" style="width:46px;height:46px"><span style="font-size:22px">💳</span></div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--oc-cream)">台胞專屬旅遊錢包</div>
+          <div style="font-size:11px;color:var(--oc-muted);margin-top:2px">Taiwan Resident Travel-E-Card　全數位儲值帳戶，專為短期商旅設計</div>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:12px">
+        <div class="card" style="padding:10px 12px">
+          <div class="lbl">支援入金方式</div>
+          <div class="val" style="font-size:12px;margin-top:4px">Visa · MasterCard · JCB · American Express</div>
+          <div class="sub">境外信用卡直接儲值，無需大陸銀行帳戶</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div class="lbl">帳戶效期</div>
+          <div style="display:flex;align-items:baseline;gap:4px;margin-top:4px"><span class="val-md">120</span><span style="font-size:12px;color:var(--oc-muted)">天</span></div>
+          <div class="sub">到期後餘額自動退回原境外卡，資金安全有保障</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div class="lbl">可選儲值額度</div>
+          <div class="val" style="margin-top:4px">5,000 · 7,000 · 10,000</div>
+          <div class="sub">人民幣，三檔彈性選擇</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div class="lbl">開通場景</div>
+          <div class="val" style="font-size:12px;margin-top:4px">微信小程式「廈行空中櫃台」</div>
+          <div class="sub">5分鐘完成，抵達前預先開通</div>
+        </div>
+      </div>
+      <div class="quote-bar"><div style="font-size:12px;color:var(--oc-seafoam)">核心價值：讓台胞在出發前即完成開戶，抵陸當天即可使用微信支付 / 支付寶，無縫融入大陸消費場景。</div></div>
+    </div>
+    <div class="row">
+      <span class="chip"><span class="chip-dot"></span>無需實體卡</span>
+      <span class="chip"><span class="chip-dot"></span>無需居住證明</span>
+      <span class="chip"><span class="chip-dot"></span>全程線上開通</span>
+      <span class="chip"><span class="chip-dot"></span>資金自動退回保障</span>
+      <span class="chip"><span class="chip-dot"></span>即開即用行動支付</span>
+    </div>
+  </div>
+  <div class="panel" id="p2">
+    <div class="card card-teal" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div class="icon-box" style="width:46px;height:46px"><span style="font-size:22px">🏦</span></div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--oc-cream)">鬆 E 廈卡</div>
+          <div style="font-size:11px;color:var(--oc-muted);margin-top:2px">實體儲蓄卡　長期持有金融帳戶，具備完整存款與理財功能</div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--oc-seafoam);margin-bottom:10px">五大生活權益</div>
+      <div class="g2">
+        <div class="card" style="padding:10px 12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">🍜</span><span style="font-size:13px;font-weight:600;color:var(--oc-seafoam)">食</span></div>
+          <div style="font-size:12px;color:rgba(241,250,238,0.7)">特約商戶折扣優惠 + 網紅美食地圖推薦，覆蓋廈門主要餐飲場景</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">🏨</span><span style="font-size:13px;font-weight:600;color:var(--oc-seafoam)">住</span></div>
+          <div style="font-size:12px;color:rgba(241,250,238,0.7)">合作酒店預訂優惠 + 延遲退房服務，提升入住體驗</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">✈</span><span style="font-size:13px;font-weight:600;color:var(--oc-seafoam)">行</span></div>
+          <div style="font-size:12px;color:rgba(241,250,238,0.7)">機場接送服務、貴賓室使用權、小三通船票升等商務艙</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">🏥</span><span style="font-size:13px;font-weight:600;color:var(--oc-seafoam)">醫</span></div>
+          <div style="font-size:12px;color:rgba(241,250,238,0.7)">台胞友善醫院綠色通道 + 線上醫療諮詢，異地就醫無障礙</div>
+        </div>
+      </div>
+      <div class="card" style="padding:10px 12px;margin-top:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">🛍</span><span style="font-size:13px;font-weight:600;color:var(--oc-seafoam)">物</span></div>
+        <div style="font-size:12px;color:rgba(241,250,238,0.7)">行李寄存服務 + 閩台特產配送，輕鬆購物不負重</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" id="p3">
+    <div class="card" style="overflow:hidden;padding:0">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:rgba(45,139,139,0.15)">
+            <th style="padding:10px 14px;text-align:left;color:var(--oc-muted);font-weight:500;border-bottom:1px solid var(--oc-border)">比較項目</th>
+            <th style="padding:10px 14px;text-align:center;color:var(--oc-seafoam);font-weight:600;border-bottom:1px solid var(--oc-border)">旅遊錢包</th>
+            <th style="padding:10px 14px;text-align:center;color:var(--oc-seafoam);font-weight:600;border-bottom:1px solid var(--oc-border)">鬆E廈卡</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--oc-border)"><td style="padding:9px 14px;color:var(--oc-muted)">卡片形式</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">全數位，無實體</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">實體儲蓄卡</td></tr>
+          <tr style="border-bottom:1px solid var(--oc-border)"><td style="padding:9px 14px;color:var(--oc-muted)">適用族群</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">短期旅遊 / 商旅</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">長期居留 / 常往返</td></tr>
+          <tr style="border-bottom:1px solid var(--oc-border)"><td style="padding:9px 14px;color:var(--oc-muted)">開通方式</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">線上 5 分鐘</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">線上申請後寄卡</td></tr>
+          <tr style="border-bottom:1px solid var(--oc-border)"><td style="padding:9px 14px;color:var(--oc-muted)">效期</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">120 天</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">長期有效</td></tr>
+          <tr style="border-bottom:1px solid var(--oc-border)"><td style="padding:9px 14px;color:var(--oc-muted)">生活權益</td><td style="padding:9px 14px;text-align:center;color:rgba(168,218,220,0.35)">基本</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">食住行醫物 五大</td></tr>
+          <tr><td style="padding:9px 14px;color:var(--oc-muted)">理財功能</td><td style="padding:9px 14px;text-align:center;color:rgba(168,218,220,0.35)">無</td><td style="padding:9px 14px;text-align:center;color:var(--oc-cream)">存款 + 理財</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 DIGITAL ONBOARDING -->
+<div class="slide" id="s4" style="background:var(--oc-bg2);padding:28px 24px 70px">
+  <div class="shdr"><div class="stag">03 數位流程</div><div class="stitle">空中櫃台<em>三步驟</em>開戶體驗</div></div>
+  <div class="g2">
+    <div>
+      <div style="display:flex;gap:14px;margin-bottom:16px">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="tl-dot">1</div>
+          <div class="tl-line" style="height:60px;margin-top:4px"></div>
+        </div>
+        <div style="flex:1">
+          <div class="card" style="padding:12px 14px">
+            <div style="font-size:14px;font-weight:600;color:var(--oc-cream);margin-bottom:4px">資料錄入</div>
+            <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6;margin-bottom:8px">開啟微信「廈行空中櫃台」小程式，依序上傳台灣居民來往大陸通行證（台胞證）與台灣身分證正反面，系統自動識別資料。</div>
+            <span class="pill" style="font-size:11px">微信小程式入口</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:16px">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="tl-dot">2</div>
+          <div class="tl-line" style="height:60px;margin-top:4px"></div>
+        </div>
+        <div style="flex:1">
+          <div class="card" style="padding:12px 14px">
+            <div style="font-size:14px;font-weight:600;color:var(--oc-cream);margin-bottom:4px">智慧認證</div>
+            <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6;margin-bottom:8px">AI 人臉識別比對台胞證照片，線上完成身份核驗。系統即時審核，無需親自到銀行臨櫃，全程約 3–5 分鐘。</div>
+            <span class="pill" style="font-size:11px">AI 人臉識別</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="tl-dot" style="background:var(--oc-teal2)">3</div>
+        </div>
+        <div style="flex:1">
+          <div class="card card-teal" style="padding:12px 14px">
+            <div style="font-size:14px;font-weight:600;color:var(--oc-cream);margin-bottom:4px">綁卡入金，即刻啟用</div>
+            <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6;margin-bottom:8px">綁定台灣或境外信用卡（Visa / MC / JCB / AE）完成充值，帳戶立即生效，可直接綁定微信支付與支付寶，開啟完整行動支付功能。</div>
+            <span class="pill" style="font-size:11px">立即可用</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px;padding:14px 16px">
+        <div class="lbl" style="margin-bottom:10px">支援境外入金卡種</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <span class="chip"><span class="chip-dot"></span>Visa</span>
+          <span class="chip"><span class="chip-dot"></span>MasterCard</span>
+          <span class="chip"><span class="chip-dot"></span>JCB</span>
+          <span class="chip"><span class="chip-dot"></span>American Express</span>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px;padding:14px 16px">
+        <div class="lbl" style="margin-bottom:10px">核心開戶優勢</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px"><span class="pill" style="min-width:64px;text-align:center">無紙化</span><span style="font-size:12px;color:rgba(168,218,220,0.7)">全程線上完成，零紙本文件</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="pill" style="min-width:64px;text-align:center">免臨櫃</span><span style="font-size:12px;color:rgba(168,218,220,0.7)">無需前往銀行，身處台灣即可申請</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="pill" style="min-width:64px;text-align:center">5分鐘</span><span style="font-size:12px;color:rgba(168,218,220,0.7)">快速開戶，旅遊前完成準備</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="pill" style="min-width:64px;text-align:center">7×24</span><span style="font-size:12px;color:rgba(168,218,220,0.7)">全天候服務，不受銀行營業時間限制</span></div>
+        </div>
+      </div>
+      <div class="quote-bar">
+        <div style="font-size:12px;color:var(--oc-seafoam)">相較傳統銀行平均 <strong>3–7個工作日</strong> 開戶流程，空中櫃台將體驗壓縮至 <strong>5分鐘內</strong>，大幅降低台胞使用金融服務的摩擦力。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5 FINANCE -->
+<div class="slide" id="s5" style="background:var(--oc-bg);padding:28px 24px 70px">
+  <div class="shdr"><div class="stag">04 專屬金融</div><div class="stitle">親遊貸 &amp; <em>金馬特別禮遇</em></div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div>
+      <div class="card card-teal" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div class="icon-box"><span style="font-size:16px">💰</span></div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--oc-cream)">親遊貸</div>
+            <div style="font-size:11px;color:var(--oc-muted)">台胞消費貸款方案</div>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:12px">
+          <div style="text-align:center;padding:8px 4px">
+            <div class="val-big" style="font-size:22px">5<span style="font-size:13px">萬</span></div>
+            <div class="lbl" style="margin-top:4px">最高額度 RMB</div>
+          </div>
+          <div style="text-align:center;padding:8px 4px">
+            <div class="val-big" style="font-size:22px">3<span style="font-size:13px">%</span></div>
+            <div class="lbl" style="margin-top:4px">最低年利率起</div>
+          </div>
+          <div style="text-align:center;padding:8px 4px">
+            <div style="font-size:15px;font-weight:700;color:var(--oc-seafoam)">首筆</div>
+            <div class="lbl" style="margin-top:4px">大陸信用建立</div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div style="font-size:12px;color:rgba(168,218,220,0.65);line-height:1.6">配合大陸惠台政策提供最低 3% 優惠利率，協助台胞在大陸建立首筆信用紀錄，為未來長期金融往來奠定基礎。</div>
+      </div>
+      <div class="card" style="padding:12px 14px">
+        <div class="lbl" style="margin-bottom:8px">親遊貸適用場景</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="chip" style="display:flex"><span class="chip-dot"></span><span style="font-size:12px">旅遊購物 / 娛樂消費</span></div>
+          <div class="chip" style="display:flex"><span class="chip-dot"></span><span style="font-size:12px">醫療美容 / 健康消費</span></div>
+          <div class="chip" style="display:flex"><span class="chip-dot"></span><span style="font-size:12px">研學教育費用</span></div>
+          <div class="chip" style="display:flex"><span class="chip-dot"></span><span style="font-size:12px">短期商務週轉</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div class="icon-box"><span style="font-size:16px">🚢</span></div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--oc-cream)">金馬地區特別禮遇</div>
+            <div style="font-size:11px;color:var(--oc-muted)">小三通旅客專屬優惠</div>
+          </div>
+        </div>
+        <div class="card card-teal" style="padding:10px 12px;margin-bottom:8px">
+          <div class="lbl">退稅手續費優惠</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:5px">
+            <div style="text-align:center">
+              <div style="font-size:18px;color:rgba(240,150,120,0.8);text-decoration:line-through;font-weight:700">2%</div>
+              <div style="font-size:10px;color:rgba(240,150,120,0.6)">一般費率</div>
+            </div>
+            <div style="font-size:18px;color:var(--oc-muted)">→</div>
+            <div style="text-align:center">
+              <div style="font-size:22px;font-weight:800;color:var(--oc-teal)">1%</div>
+              <div style="font-size:10px;color:var(--oc-muted)">廈行優惠</div>
+            </div>
+            <div style="flex:1;font-size:12px;color:rgba(168,218,220,0.65)">小三通退稅款直接入廈行帳戶，享半價手續費</div>
+          </div>
+        </div>
+        <div class="card" style="padding:10px 12px;margin-bottom:8px">
+          <div class="lbl">船票升等福利</div>
+          <div style="font-size:12px;color:rgba(168,218,220,0.7);margin-top:5px;line-height:1.6">持卡消費達標後，享小三通航班免費商務艙升等，提升兩岸往返舒適度</div>
+        </div>
+        <div class="card" style="padding:10px 12px">
+          <div class="lbl">金門 / 馬祖在地優惠</div>
+          <div style="font-size:12px;color:rgba(168,218,220,0.7);margin-top:5px;line-height:1.6">與金門、馬祖地區特約商戶合作，覆蓋住宿、餐飲、伴手禮等在地消費場景</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 MARKETING -->
+<div class="slide" id="s6" style="background:var(--oc-bg2);padding:28px 24px 70px">
+  <div class="shdr"><div class="stag">05 行銷策略</div><div class="stitle">精準分眾 ×<em>全渠道覆蓋</em></div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="lbl" style="margin-bottom:10px">三大精準受眾分群</div>
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+          <div class="icon-box" style="width:34px;height:34px"><span style="font-size:14px">🎭</span></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--oc-seafoam);margin-bottom:2px">閩南文化交流族群</div>
+            <div style="font-size:12px;color:rgba(168,218,220,0.6)">宗親訪問、廟宇文化、歷史尋根旅遊，高黏著度、回訪率高的核心族群</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+          <div class="icon-box" style="width:34px;height:34px"><span style="font-size:14px">🎓</span></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--oc-seafoam);margin-bottom:2px">赴陸研學台灣學生</div>
+            <div style="font-size:12px;color:rgba(168,218,220,0.6)">交換生、語言課程、兩岸高校合作項目，年輕數位原住民，長期帳戶潛力高</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div class="icon-box" style="width:34px;height:34px"><span style="font-size:14px">🎮</span></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--oc-seafoam);margin-bottom:2px">電競 / 體育賽事族群</div>
+            <div style="font-size:12px;color:rgba(168,218,220,0.6)">兩岸電競賽事、體育交流活動，高消費意願，具社群擴散效應</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="lbl" style="margin-bottom:10px">五大獲客渠道</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pill" style="min-width:80px;text-align:center;font-size:11px">實體場域</span>
+            <span style="font-size:12px;color:rgba(168,218,220,0.7)">機場航廈 + 小三通碼頭精準廣告投放</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pill" style="min-width:80px;text-align:center;font-size:11px">KOL合作</span>
+            <span style="font-size:12px;color:rgba(168,218,220,0.7)">旅遊達人 / 生活網紅深度體驗內容</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pill" style="min-width:80px;text-align:center;font-size:11px">B2B聯動</span>
+            <span style="font-size:12px;color:rgba(168,218,220,0.7)">在陸台商企業員工福利計畫綁定</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pill" style="min-width:80px;text-align:center;font-size:11px">社群裂變</span>
+            <span style="font-size:12px;color:rgba(168,218,220,0.7)">微信社群口碑推薦 + 推薦返現獎勵</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pill" style="min-width:80px;text-align:center;font-size:11px">學校合作</span>
+            <span style="font-size:12px;color:rgba(168,218,220,0.7)">兩岸合作高校入學開卡禮遇方案</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card card-teal" style="padding:14px 16px">
+    <div style="font-size:12px;font-weight:600;color:var(--oc-seafoam);margin-bottom:8px">整合行銷漏斗</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="chip"><span class="chip-dot"></span>觸達曝光</span>
+      <span style="color:var(--oc-muted);font-size:12px">→</span>
+      <span class="chip"><span class="chip-dot"></span>興趣喚起</span>
+      <span style="color:var(--oc-muted);font-size:12px">→</span>
+      <span class="chip"><span class="chip-dot"></span>線上開戶</span>
+      <span style="color:var(--oc-muted);font-size:12px">→</span>
+      <span class="chip"><span class="chip-dot"></span>首次消費</span>
+      <span style="color:var(--oc-muted);font-size:12px">→</span>
+      <span class="chip"><span class="chip-dot"></span>口碑推薦</span>
+      <span style="color:var(--oc-muted);font-size:12px">→</span>
+      <span class="chip"><span class="chip-dot"></span>長期留存</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<div class="nav">
+  <button class="nbtn" onclick="go(-1)">← 上一頁</button>
+  <div class="dots" id="dots"></div>
+  <span class="ncount" id="nc">1 / 6</span>
+  <button class="nbtn" onclick="go(1)">下一頁 →</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+var c=1,tot=6;
+var dotsEl=document.getElementById('dots');
+for(var i=1;i<=tot;i++){
+  var d=document.createElement('button');
+  d.className='dot'+(i===1?' on':'');
+  d.setAttribute('data-n',i);
+  d.onclick=(function(n){return function(){goTo(n)}})(i);
+  dotsEl.appendChild(d);
+}
+function goTo(n){
+  document.getElementById('s'+c).classList.remove('active');
+  dotsEl.children[c-1].classList.remove('on');
+  c=Math.max(1,Math.min(tot,n));
+  document.getElementById('s'+c).classList.add('active');
+  dotsEl.children[c-1].classList.add('on');
+  document.getElementById('nc').textContent=c+' / '+tot;
+  document.getElementById('prog').style.width=(c/tot*100)+'%';
+}
+function go(d){goTo(c+d);}
+function swTab(n){
+  for(var i=1;i<=3;i++){
+    document.getElementById('t'+i).classList.remove('on');
+    document.getElementById('p'+i).classList.remove('on');
+  }
+  document.getElementById('t'+n).classList.add('on');
+  document.getElementById('p'+n).classList.add('on');
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+});
+</script>
+</body>
+</html>

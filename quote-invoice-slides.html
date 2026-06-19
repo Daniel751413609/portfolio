@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>報價請款流程自動化 | 精盛清潔</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a0f06;--bg2:#200e04;
+  --brown:#5a3e2b;--brown2:#7a5535;--brown3:#9b6b41;
+  --cream:#f5ede3;--cream2:#ede0d0;--cream3:#d4b896;
+  --accent:#c0703a;--accent2:#e0844a;
+  --muted:rgba(212,184,150,0.6);
+  --border:rgba(192,112,58,0.22);--border2:rgba(192,112,58,0.4);
+  --page-bg:#100804;
+}
+html,body{min-height:100%}
+body{
+  font-family:'Manrope','Noto Sans TC','Segoe UI',Arial,sans-serif;
+  background:
+    radial-gradient(circle at top left,rgba(192,112,58,0.18),transparent 28%),
+    radial-gradient(circle at top right,rgba(90,62,43,0.15),transparent 24%),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  color:var(--cream);
+  padding:32px 20px 60px;
+}
+.page-shell{max-width:1180px;margin:0 auto}
+
+/* ── header ── */
+.deck-header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px;flex-wrap:wrap}
+.deck-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(192,112,58,0.12);border:1px solid var(--border2);
+  color:var(--cream3);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px
+}
+.deck-kicker-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.deck-title{font-size:clamp(28px,4.4vw,46px);font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:10px}
+.deck-title em{font-style:normal;color:var(--accent2)}
+.deck-sub{max-width:680px;font-size:14px;line-height:1.8;color:var(--muted)}
+.deck-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;align-self:flex-end}
+.deck-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 18px;border-radius:999px;text-decoration:none;
+  font-size:12px;font-weight:800;letter-spacing:.05em;
+  transition:transform .18s,box-shadow .18s,background .18s;cursor:pointer;border:none;
+}
+.deck-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:rgba(192,112,58,0.12);border:1px solid var(--border2);color:var(--cream3)}
+
+/* ── divider ── */
+.section-label{
+  font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent2);margin:36px 0 16px;display:flex;align-items:center;gap:14px
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── grid ── */
+.slides-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.slides-grid.full{grid-template-columns:1fr}
+
+/* ── slide card ── */
+.slide-card{
+  background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);
+  border:1px solid var(--border);border-radius:16px;
+  padding:28px 28px 26px;position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.slide-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.slide-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  opacity:0;transition:opacity .2s;
+}
+.slide-card:hover::before{opacity:1}
+
+/* ── cover card ── */
+.slide-cover{
+  background:linear-gradient(135deg,rgba(192,112,58,0.18),rgba(90,62,43,0.25));
+  border:1px solid var(--border2);border-radius:16px;
+  padding:48px 44px;margin-bottom:20px;position:relative;overflow:hidden;
+  grid-column:1/-1;
+}
+.slide-cover::after{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(192,112,58,0.15),transparent 70%);
+}
+
+.card-num{
+  font-size:11px;font-weight:800;letter-spacing:.15em;color:var(--accent2);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.card-num span{
+  background:rgba(192,112,58,0.15);border:1px solid var(--border2);
+  border-radius:999px;padding:3px 10px;
+}
+.card-tag{
+  display:inline-block;font-size:10px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent2);
+  background:rgba(192,112,58,0.1);border:1px solid var(--border);
+  border-radius:999px;padding:3px 10px;margin-bottom:14px
+}
+h2{font-size:clamp(17px,2.2vw,22px);font-weight:800;line-height:1.25;letter-spacing:-.02em;margin-bottom:12px;color:var(--cream)}
+h3{font-size:13px;font-weight:700;color:var(--cream3);margin-bottom:8px}
+p{font-size:13.5px;line-height:1.75;color:var(--muted)}
+ul,ol{margin-left:18px}
+li{font-size:13px;line-height:1.85;color:var(--muted);margin-bottom:2px}
+li strong,b,strong{color:var(--cream2)}
+
+/* callout */
+.callout{
+  background:rgba(192,112,58,0.08);border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;
+}
+.callout p{font-size:13px;color:var(--cream2);margin:0}
+
+/* code box */
+.code-box{
+  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.07);
+  border-radius:8px;padding:14px 16px;
+  font-family:'SF Mono','Menlo','Consolas',monospace;font-size:11.5px;
+  line-height:1.7;color:#e8d5be;white-space:pre;margin:12px 0;overflow-x:auto;
+}
+
+/* two-col inside card */
+.inner-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.inner-box{
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:10px;padding:14px 14px 12px;
+}
+
+/* badges */
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.badge{
+  background:rgba(192,112,58,0.15);border:1px solid var(--border2);
+  color:var(--cream3);font-size:11.5px;font-weight:700;
+  padding:4px 12px;border-radius:999px
+}
+
+/* flow */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:12px 0}
+.flow-step{
+  background:rgba(192,112,58,0.18);border:1px solid var(--border2);
+  color:var(--cream2);font-size:11.5px;font-weight:700;
+  padding:6px 12px;border-radius:8px;text-align:center;line-height:1.4;
+}
+.flow-arrow{color:var(--accent2);font-size:16px;font-weight:800}
+
+/* table */
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0}
+.data-table th{
+  background:rgba(192,112,58,0.18);color:var(--cream3);
+  padding:8px 12px;text-align:left;font-weight:700;font-size:11.5px;letter-spacing:.04em;
+}
+.data-table td{
+  padding:8px 12px;border-bottom:1px solid var(--border);color:var(--muted);
+}
+.data-table tr:last-child td{border-bottom:none}
+
+/* stat row */
+.stat-row{display:flex;gap:10px;margin:14px 0}
+.stat{flex:1;background:rgba(192,112,58,0.1);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat .num{font-size:26px;font-weight:800;color:var(--accent2);display:block;line-height:1.1}
+.stat .lbl{font-size:10.5px;color:var(--muted);margin-top:4px;display:block;line-height:1.4}
+
+/* cover big text */
+.cover-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 16px;border-radius:999px;margin-bottom:18px;
+  background:rgba(192,112,58,0.15);border:1px solid var(--border2);
+  color:var(--cream3);font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+}
+.cover-title{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.05;letter-spacing:-.03em;margin-bottom:16px}
+.cover-title em{font-style:normal;color:var(--accent2)}
+.cover-sub{font-size:15px;line-height:1.85;color:var(--muted);max-width:560px}
+.cover-deco{width:48px;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;margin:18px 0}
+
+/* long card spans 2 columns */
+.span2{grid-column:span 2}
+@media(max-width:760px){.span2{grid-column:span 1}.inner-grid{grid-template-columns:1fr}.stat-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="page-shell">
+
+  <!-- ── Page Header ── -->
+  <div class="deck-header">
+    <div>
+      <div class="deck-kicker"><span class="deck-kicker-dot"></span>精盛清潔 × Claude Code</div>
+      <h1 class="deck-title">報價請款與<br><em>檔案管理自動化</em></h1>
+      <p class="deck-sub">讓繁瑣的行政流程變成一句話——從查統編、開報價，到請款、歸檔，全程自動完成。</p>
+    </div>
+    <div class="deck-actions">
+      <a href="index.html" class="deck-btn btn-secondary">← 返回首頁</a>
+    </div>
+  </div>
+
+  <!-- ── Cover Slide ── -->
+  <div class="slide-cover">
+    <div class="cover-kicker"><span class="deck-kicker-dot"></span>第一部分</div>
+    <div class="cover-title">報價、請款與<br><em>檔案管理自動化</em></div>
+    <div class="cover-deco"></div>
+    <p class="cover-sub">這套 Claude Code 設定把 9 個手動步驟壓縮成一句白話——從查詢客戶統編到 PDF 自動歸檔，不需要任何技術背景。</p>
+  </div>
+
+  <!-- ── Slides ── -->
+  <div class="section-label">能力說明 Slides 01 – 10</div>
+  <div class="slides-grid">
+
+    <!-- 01 能力總覽 -->
+    <div class="slide-card">
+      <div class="card-num"><span>01</span></div>
+      <div class="card-tag">能力總覽</div>
+      <h2>報價、請款與<br>檔案管理自動化</h2>
+      <p>這套設定協助處理固定行政流程，七大核心能力一次到位：</p>
+      <div class="badges" style="margin-top:14px">
+        <span class="badge">查詢公司統編與地址</span>
+        <span class="badge">產生報價單 PDF</span>
+        <span class="badge">產生請款單 PDF</span>
+        <span class="badge">自動計算 5% 稅額</span>
+        <span class="badge">智慧檔名命名</span>
+        <span class="badge">自動歸檔</span>
+        <span class="badge">保留文件紀錄</span>
+      </div>
+    </div>
+
+    <!-- 02 問題定義 -->
+    <div class="slide-card">
+      <div class="card-num"><span>02</span></div>
+      <div class="card-tag">問題定義</div>
+      <h2>把重複行政工作<br>變成一句話</h2>
+      <div class="inner-grid">
+        <div class="inner-box">
+          <h3>原本 9 個手動步驟</h3>
+          <ol style="margin-top:6px">
+            <li>查公司資料</li>
+            <li>打開文件模板</li>
+            <li>填入客戶名稱</li>
+            <li>填入地址</li>
+            <li>填入品項金額</li>
+            <li>計算 5% 稅</li>
+            <li>匯出 PDF</li>
+            <li>命名檔案</li>
+            <li>找資料夾歸檔</li>
+          </ol>
+        </div>
+        <div class="inner-box" style="display:flex;flex-direction:column;justify-content:center">
+          <h3>現在只需要一句話</h3>
+          <div class="callout" style="margin-top:8px">
+            <p>幫我出報價單給 XXX 公司，地址是 XXX，清潔一式 10000 元</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 統編查詢 -->
+    <div class="slide-card">
+      <div class="card-num"><span>03</span></div>
+      <div class="card-tag">統編查詢</div>
+      <h2>自動查公司資料</h2>
+      <p>提供公司名稱，Claude 用瀏覽器自動查詢，不需要手動開網頁。</p>
+      <div class="callout">
+        <p><strong>輸入：</strong>幫我查 XXX 有限公司的統編和地址</p>
+      </div>
+      <div class="code-box">XXX 有限公司
+- 統編：12345678
+- 地址：台北市 XXX 區 XXX 路 XX 號</div>
+      <div class="badges">
+        <span class="badge">報價前確認</span>
+        <span class="badge">請款前確認</span>
+        <span class="badge">建立客戶檔案</span>
+      </div>
+    </div>
+
+    <!-- 04 報價單流程 -->
+    <div class="slide-card">
+      <div class="card-num"><span>04</span></div>
+      <div class="card-tag">報價單</div>
+      <h2>自動產生報價單 PDF</h2>
+      <div class="callout">
+        <p><strong>觸發語句：</strong>出報價單給 XXX 公司</p>
+      </div>
+      <div class="inner-grid" style="margin-top:10px">
+        <div class="inner-box">
+          <h3>Claude 會確認</h3>
+          <ul>
+            <li>客戶公司名稱</li>
+            <li>施作地址</li>
+            <li>品項名稱</li>
+            <li>數量 / 單價</li>
+            <li>備註（可省略）</li>
+          </ul>
+        </div>
+        <div class="inner-box">
+          <h3>自動產生</h3>
+          <ul>
+            <li>小計</li>
+            <li>5% 稅額</li>
+            <li>總計</li>
+            <li>報價日期</li>
+            <li>PDF 檔案</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 輸入範例 span 2 -->
+    <div class="slide-card span2">
+      <div class="card-num"><span>05</span></div>
+      <div class="card-tag">輸入範例</div>
+      <h2>使用者只需要講白話</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+        <div>
+          <p style="font-size:12px;color:var(--cream3);margin-bottom:8px;">使用者輸入</p>
+          <div class="callout">
+            <p style="line-height:1.9">幫我出報價單給 <strong>大山工程有限公司</strong>，<br>
+            地址是台北市信義區忠孝東路五段 100 號，<br>
+            清潔一式 10000 元，垃圾清運 3000 元。</p>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:12px;color:var(--cream3);margin-bottom:8px;">Claude 自動轉換並產生 PDF</p>
+          <div class="code-box">{ "client": "大山工程有限公司",
+  "address": "台北市信義區
+               忠孝東路五段100號",
+  "items": [
+    { "name": "清潔一式",
+      "qty": 1, "unit_price": 10000 },
+    { "name": "垃圾清運",
+      "qty": 1, "unit_price": 3000 }
+  ] }</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 請款單 -->
+    <div class="slide-card">
+      <div class="card-num"><span>06</span></div>
+      <div class="card-tag">請款單</div>
+      <h2>自動產生請款單 PDF</h2>
+      <div class="callout">
+        <p><strong>觸發語句：</strong>出請款單給 XXX 公司</p>
+      </div>
+      <table class="data-table" style="margin-top:12px">
+        <tr><th>欄位</th><th>說明</th></tr>
+        <tr><td>請款日期</td><td>自動帶入台北當日</td></tr>
+        <tr><td>客戶 / 地址</td><td>使用者提供</td></tr>
+        <tr><td>小計 / 稅額 / 總計</td><td>自動計算</td></tr>
+        <tr><td>匯款資訊</td><td>瑞興銀行，固定印出</td></tr>
+      </table>
+    </div>
+
+    <!-- 07 含稅反推 -->
+    <div class="slide-card">
+      <div class="card-num"><span>07</span></div>
+      <div class="card-tag">含稅反推</div>
+      <h2>支援含稅金額反推</h2>
+      <div class="callout">
+        <p><strong>使用者說：</strong>清潔一式含稅 10500 元</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><span class="num">10,500</span><span class="lbl">含稅總額（輸入）</span></div>
+        <div class="stat"><span class="num">÷1.05</span><span class="lbl">自動反推</span></div>
+        <div class="stat"><span class="num">10,000</span><span class="lbl">未稅小計</span></div>
+      </div>
+      <div class="code-box">小計：  10,000 元
+稅額：     500 元
+總計：  10,500 元  ✓</div>
+    </div>
+
+    <!-- 08 自動歸檔 -->
+    <div class="slide-card">
+      <div class="card-num"><span>08</span></div>
+      <div class="card-tag">自動歸檔</div>
+      <h2>產生後自動建立紀錄</h2>
+      <p>PDF 產生後系統自動整理到本地資料夾，三段式搜尋邏輯：</p>
+      <div class="flow" style="margin-top:12px">
+        <div class="flow-step">搜尋 Documents<br>客戶資料夾</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">搜尋請款<br>資料夾</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">自動建立<br>新資料夾</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">存入 PDF</div>
+      </div>
+      <div class="inner-box" style="margin-top:10px">
+        <h3>比對規則（任一符合即視為同客戶）</h3>
+        <ul style="margin-top:6px">
+          <li>客戶名稱包含資料夾名稱</li>
+          <li>資料夾名稱包含客戶名稱</li>
+          <li>客戶名前 4 字與資料夾前 4 字相同</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 09 檔名規則 -->
+    <div class="slide-card">
+      <div class="card-num"><span>09</span></div>
+      <div class="card-tag">檔名規則</div>
+      <h2>用日期與地址產生檔名</h2>
+      <table class="data-table">
+        <tr><th>文件類型</th><th>檔名範例</th></tr>
+        <tr><td>報價單</td><td><code style="color:var(--accent2)">260418_忠孝東路五段.pdf</code></td></tr>
+        <tr><td>請款單</td><td><code style="color:var(--accent2)">260418_忠孝東路五段_請款.pdf</code></td></tr>
+      </table>
+      <div class="inner-grid" style="margin-top:8px">
+        <div class="inner-box">
+          <h3>地址截取邏輯</h3>
+          <ul>
+            <li>取區之後的路名</li>
+            <li>帶段數與巷號</li>
+            <li>弄、號不帶入</li>
+          </ul>
+        </div>
+        <div class="inner-box">
+          <h3>範例</h3>
+          <ul>
+            <li style="font-size:11.5px">信義區忠孝東路五段<br>→ <strong>忠孝東路五段</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 價值總結 span 2 -->
+    <div class="slide-card span2">
+      <div class="card-num"><span>10</span></div>
+      <div class="card-tag">價值總結</div>
+      <h2>不只是產文件，而是建立工作紀錄</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;align-items:start">
+        <div>
+          <p>這套流程產生的不只是 PDF，它同時建立了一套<strong>輕量級文件管理系統</strong>，不需要額外購買任何軟體。</p>
+          <div class="badges" style="margin-top:14px">
+            <span class="badge">客戶資料紀錄</span>
+            <span class="badge">案場地址紀錄</span>
+            <span class="badge">報價歷史</span>
+            <span class="badge">請款歷史</span>
+            <span class="badge">本地文件歸檔</span>
+            <span class="badge">可追蹤行政流程</span>
+          </div>
+        </div>
+        <div class="callout" style="margin:0;padding:20px 22px">
+          <p style="font-size:14.5px;line-height:1.8;color:var(--cream2)">
+            對小型公司或個人工作室來說，<br>
+            這等於是一套<strong>零成本的輕量級文件管理系統</strong>——<br><br>
+            不需要技術背景，不需要額外軟體，<br>
+            只需要一句話。
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /slides-grid -->
+
+  <!-- footer -->
+  <div style="margin-top:48px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <p style="font-size:12px;color:var(--muted)">精盛清潔有限公司 × Claude Code 自動化流程 | 2026</p>
+    <a href="index.html" class="deck-btn btn-secondary" style="font-size:11px;padding:8px 16px">← 返回首頁</a>
+  </div>
+
+</div><!-- /page-shell -->
+</body>
+</html>

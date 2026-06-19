@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中國金融期貨交易所研究部實習分享 | 鄭嘉雄</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --oc-bg:#0d1b2a;--oc-bg2:#111f30;--oc-bg3:#162840;
+  --oc-teal:#2d8b8b;--oc-teal2:#3aa3a3;--oc-seafoam:#a8dadc;
+  --oc-cream:#f1faee;--oc-muted:rgba(168,218,220,0.68);
+  --oc-border:rgba(45,139,139,0.22);--oc-border2:rgba(45,139,139,0.4);
+  --page-bg:#08121c;--page-bg2:#0e1d2b;
+}
+html,body{min-height:100%}
+body{
+  font-family:'Manrope','Noto Sans TC','Segoe UI',Arial,sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(45,139,139,0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(58,163,163,0.12), transparent 24%),
+    linear-gradient(180deg, var(--page-bg) 0%, var(--page-bg2) 100%);
+  color:var(--oc-cream);
+  padding:32px 20px 48px;
+}
+.page-shell{max-width:1180px;margin:0 auto}
+.deck-header{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  margin-bottom:24px;
+}
+.deck-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(45,139,139,0.12);border:1px solid var(--oc-border2);
+  color:var(--oc-seafoam);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.deck-kicker-dot{width:8px;height:8px;border-radius:50%;background:var(--oc-teal)}
+.deck-title{font-size:clamp(28px,4.4vw,46px);font-weight:800;line-height:1.02;letter-spacing:-.03em;margin-bottom:10px}
+.deck-title em{font-style:normal;color:var(--oc-teal2)}
+.deck-sub{max-width:780px;font-size:14px;line-height:1.8;color:var(--oc-muted)}
+.deck-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.deck-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 18px;border-radius:999px;text-decoration:none;
+  font-size:12px;font-weight:800;letter-spacing:.05em;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.deck-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.deck-btn-primary{
+  background:var(--oc-teal);color:#fff;box-shadow:0 14px 30px rgba(45,139,139,0.22);
+}
+.deck-btn-primary:hover{background:var(--oc-teal2);transform:translateY(-1px)}
+.deck-btn-ghost{
+  border:1px solid var(--oc-border2);color:var(--oc-seafoam);background:rgba(255,255,255,0.03);
+}
+.deck-btn-ghost:hover{background:rgba(45,139,139,0.12);transform:translateY(-1px)}
+.deck-frame{
+  border:1px solid var(--oc-border);
+  border-radius:28px;
+  padding:18px;
+  background:rgba(255,255,255,0.03);
+  box-shadow:0 30px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  backdrop-filter:blur(12px);
+}
+.feature-board{
+  background:linear-gradient(160deg, var(--oc-bg) 0%, var(--oc-bg2) 100%);
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid var(--oc-border);
+}
+.hero-photo{
+  padding:22px;
+  border-bottom:1px solid var(--oc-border);
+}
+.hero-photo img{
+  width:100%;
+  display:block;
+  border-radius:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.28);
+}
+.content-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:0;
+}
+.content-main{
+  padding:28px 28px 34px;
+  border-right:1px solid var(--oc-border);
+}
+.content-side{
+  padding:28px;
+  background:rgba(255,255,255,0.02);
+}
+.cross-tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--oc-teal);border:1px solid var(--oc-border2);padding:2px 8px;border-radius:12px;display:inline-block}
+.section-title{
+  font-size:24px;
+  font-weight:800;
+  color:var(--oc-cream);
+  line-height:1.2;
+  margin:14px 0 12px;
+}
+.section-text{
+  font-size:14px;
+  line-height:1.9;
+  color:var(--oc-muted);
+  margin-bottom:16px;
+}
+.quote-bar{
+  border-left:3px solid var(--oc-teal);
+  padding:12px 16px;
+  background:rgba(45,139,139,0.08);
+  border-radius:0 12px 12px 0;
+  color:var(--oc-seafoam);
+  font-size:13px;
+  line-height:1.8;
+  margin-top:16px;
+}
+.card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--oc-border);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:14px;
+}
+.lbl{
+  font-size:10px;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  color:var(--oc-muted);
+  margin-bottom:6px;
+}
+.val{
+  font-size:16px;
+  color:var(--oc-cream);
+  font-weight:700;
+  line-height:1.5;
+}
+.sub{
+  font-size:12px;
+  color:rgba(168,218,220,0.56);
+  margin-top:6px;
+  line-height:1.7;
+}
+.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(45,139,139,0.18);
+  border:1px solid var(--oc-border2);
+  color:var(--oc-seafoam);
+  font-size:11px;
+  padding:5px 10px;
+  border-radius:20px;
+}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:var(--oc-teal)}
+.meta-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.meta-item{
+  padding:14px 16px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--oc-border);
+}
+.meta-k{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--oc-muted);margin-bottom:6px}
+.meta-v{font-size:13px;color:var(--oc-cream);line-height:1.7}
+.case-study{
+  border-top:1px solid var(--oc-border);
+  padding:30px 28px 34px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0.04) 100%);
+}
+.case-head{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);
+  gap:20px;
+  align-items:start;
+  margin-bottom:22px;
+}
+.case-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--oc-seafoam);
+}
+.case-kicker::before{
+  content:'';
+  width:26px;
+  height:1px;
+  background:rgba(168,218,220,0.4);
+}
+.case-title{
+  font-size:28px;
+  font-weight:800;
+  line-height:1.15;
+  letter-spacing:-.03em;
+  color:var(--oc-cream);
+}
+.case-title span{
+  display:block;
+  margin-top:8px;
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:var(--oc-seafoam);
+}
+.case-summary{
+  padding:18px 20px;
+  border-radius:16px;
+  background:rgba(45,139,139,0.08);
+  border:1px solid rgba(45,139,139,0.2);
+}
+.case-summary .lbl{color:rgba(168,218,220,0.72)}
+.case-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(280px,.92fr);
+  gap:18px;
+  align-items:start;
+}
+.case-panel{
+  background:rgba(255,255,255,0.035);
+  border:1px solid var(--oc-border);
+  border-radius:18px;
+  padding:22px;
+}
+.case-panel + .case-panel{margin-top:0}
+.case-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin-top:18px;
+}
+.step-card{
+  min-height:126px;
+  padding:16px 14px;
+  border-radius:14px;
+  border:1px solid rgba(45,139,139,0.18);
+  background:linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(45,139,139,0.04) 100%);
+}
+.step-no{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--oc-teal2);
+  margin-bottom:10px;
+}
+.step-title{
+  font-size:15px;
+  font-weight:700;
+  color:var(--oc-cream);
+  line-height:1.45;
+  margin-bottom:8px;
+}
+.step-text{
+  font-size:12px;
+  line-height:1.7;
+  color:rgba(168,218,220,0.62);
+}
+.result-card{
+  margin-top:18px;
+  padding:18px;
+  border-radius:16px;
+  background:linear-gradient(135deg, rgba(45,139,139,0.18) 0%, rgba(255,255,255,0.04) 100%);
+  border:1px solid rgba(45,139,139,0.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.result-metric{
+  font-size:28px;
+  font-weight:800;
+  color:var(--oc-cream);
+  letter-spacing:-.03em;
+  margin:4px 0 8px;
+}
+.tag-cloud{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+.tag-chip{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(168,218,220,0.18);
+  background:rgba(255,255,255,0.04);
+  color:var(--oc-seafoam);
+  font-size:11px;
+  line-height:1.2;
+}
+@media (max-width: 900px){
+  body{padding:20px 14px 28px}
+  .deck-header{flex-direction:column;align-items:flex-start}
+  .deck-actions{justify-content:flex-start}
+  .deck-frame{padding:10px;border-radius:20px}
+  .content-grid{grid-template-columns:1fr}
+  .content-main{border-right:none;border-bottom:1px solid var(--oc-border)}
+  .case-head,.case-layout,.case-grid{grid-template-columns:1fr}
+}
+@media (max-width: 640px){
+  .deck-btn{width:100%;justify-content:center}
+  .hero-photo,.content-main,.content-side,.case-study{padding:18px}
+  .case-panel{padding:18px}
+  .case-title{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <div class="deck-header">
+    <div>
+      <div class="deck-kicker"><span class="deck-kicker-dot"></span>CFFEX Internship</div>
+      <h1 class="deck-title">中國金融期貨交易所<br><em>研究部實習分享</em></h1>
+      <p class="deck-sub">以研究部實習現場照片為核心，整理成正式展示頁，補充市場分析與商情研究實習的真實參與情境與成果氛圍。</p>
+    </div>
+    <div class="deck-actions">
+      <a class="deck-btn deck-btn-ghost" href="/" target="_self">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/><path d="M21 12H9"/></svg>
+        返回首頁
+      </a>
+      <a class="deck-btn deck-btn-primary" href="mailto:aa751413609@gmail.com?subject=%E4%B8%AD%E5%9C%8B%E9%87%91%E8%9E%8D%E6%9C%9F%E8%B2%A8%E4%BA%A4%E6%98%93%E6%89%80%E7%A0%94%E7%A9%B6%E9%83%A8%E5%AF%A6%E7%BF%92%E6%B4%BD%E8%AB%87">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+        聯絡我
+      </a>
+    </div>
+  </div>
+
+  <div class="deck-frame">
+    <div class="feature-board">
+      <div class="hero-photo">
+        <img src="/assets/images/cffex-share.jpg" alt="中國金融期貨交易所研究部實習分享照片">
+      </div>
+      <div class="content-grid">
+        <div class="content-main">
+          <span class="cross-tag">市場分析與商情研究</span>
+          <h2 class="section-title">研究現場參與<br>與結構化輸出能力</h2>
+          <p class="section-text">這張照片記錄了我在中國金融期貨交易所研究部實習期間的實際分享場景。實習內容聚焦於兩岸金融市場資訊整理、標竿案例研究，以及研究觀點的結構化輸出，支援部門內部討論與研究判斷。</p>
+          <p class="section-text">在這段經歷中，我不只是協助蒐集資料，更參與了將分散資訊整理為清晰分析脈絡的過程。這也讓我更熟悉如何把產業觀察、資料整合與口頭表達結合，轉化成能被團隊快速理解與使用的研究內容。</p>
+          <div class="quote-bar">研究工作的價值不只在於找到資料，而在於把資訊整理成可判斷、可溝通、可支持決策的結構化內容。</div>
+          <div class="pill-row">
+            <span class="pill"><span class="pill-dot"></span>市場資訊整理</span>
+            <span class="pill"><span class="pill-dot"></span>標竿案例研究</span>
+            <span class="pill"><span class="pill-dot"></span>結構化分析輸出</span>
+            <span class="pill"><span class="pill-dot"></span>內部研究分享</span>
+          </div>
+        </div>
+        <div class="content-side">
+          <div class="meta-list">
+            <div class="meta-item">
+              <div class="meta-k">機構</div>
+              <div class="meta-v">中國金融期貨交易所 (CFFEX)</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-k">職務</div>
+              <div class="meta-v">研究部實習生（市場分析與商情研究）</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-k">期間</div>
+              <div class="meta-v">2024.06 — 2024.08</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-k">實習重點</div>
+              <div class="meta-v">協助開展兩岸金融市場與標竿案例研究，整理產業資訊並支援研究判斷與內部討論。</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-k">延伸能力</div>
+              <div class="meta-v">資訊蒐集流程優化、資料整合、觀點表達、研究內容結構化呈現。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="case-study">
+        <div class="case-head">
+          <div>
+            <div class="case-kicker">Research Capability Extension</div>
+            <h2 class="case-title">研究流程優化案例<span>AI × Playwright 市場情報監測流程</span></h2>
+          </div>
+            <div class="case-summary">
+              <div class="lbl">定位</div>
+            <div class="val">作為研究部實習能力的延伸案例，聚焦市場情報整理流程的優化。</div>
+          </div>
+        </div>
+
+        <div class="case-layout">
+          <div class="case-panel">
+            <div class="lbl">背景</div>
+            <p class="section-text">研究部實習期間，市場情報蒐集與資料整理是研究工作的基礎。金融市場資訊來源分散、更新頻繁，若仰賴人工整理，容易耗費大量時間在重複蒐集與彙整上。</p>
+            <div class="lbl">流程設計</div>
+            <p class="section-text" style="margin-bottom:0">因此進一步構想以 Playwright 針對指定資訊來源進行自動抓取，擷取標題、日期、摘要與來源連結，再結合 AI 進行摘要、分類、去重與重點萃取，讓研究資料整理更穩定，也更便於後續追蹤。</p>
+
+            <div class="case-grid">
+              <div class="step-card">
+                <div class="step-no">Step 01</div>
+                <div class="step-title">設定監測目標</div>
+                <div class="step-text">界定追蹤主題、範圍與更新頻率。</div>
+              </div>
+              <div class="step-card">
+                <div class="step-no">Step 02</div>
+                <div class="step-title">建立資料來源清單</div>
+                <div class="step-text">整理新聞、研究機構與政策公告等固定來源。</div>
+              </div>
+              <div class="step-card">
+                <div class="step-no">Step 03</div>
+                <div class="step-title">Playwright 自動抓取</div>
+                <div class="step-text">依排程抓取標題、日期、摘要與來源連結。</div>
+              </div>
+              <div class="step-card">
+                <div class="step-no">Step 04</div>
+                <div class="step-title">AI 摘要與分類</div>
+                <div class="step-text">進行摘要、分類，並處理重複資訊。</div>
+              </div>
+              <div class="step-card">
+                <div class="step-no">Step 05</div>
+                <div class="step-title">整合研究資料庫</div>
+                <div class="step-text">將結構化資料回收至研究資料庫。</div>
+              </div>
+              <div class="step-card">
+                <div class="step-no">Step 06</div>
+                <div class="step-title">產出市場情報摘要</div>
+                <div class="step-text">依研究需求輸出每日或主題式摘要。</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-panel">
+            <div class="lbl">成果</div>
+            <div class="result-card">
+              <div class="lbl">效率觀察</div>
+              <div class="result-metric">約 30%</div>
+              <div class="sub">資料處理速度提升約 30%，市場情報更新與資料整合效率同步提升。</div>
+            </div>
+
+            <div class="lbl" style="margin-top:18px">能力標籤</div>
+            <div class="tag-cloud">
+              <span class="tag-chip">AI 輔助研究</span>
+              <span class="tag-chip">Playwright 自動化</span>
+              <span class="tag-chip">市場情報監測</span>
+              <span class="tag-chip">資料摘要與分類</span>
+              <span class="tag-chip">研究資料庫整理</span>
+              <span class="tag-chip">流程優化</span>
+            </div>
+
+            <div class="quote-bar" style="margin-top:18px">重點不在工具本身，而在於把重複性的資訊整理流程標準化，讓研究工作能更聚焦於判讀與分析。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
